@@ -14,7 +14,7 @@ type Product = {
   video: string | null;
 };
 
-export default function SpielzeugPage() {
+export default function SpielzeugePage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [search, setSearch] = useState("");
   const [selectedDescription, setSelectedDescription] = useState<Product | null>(

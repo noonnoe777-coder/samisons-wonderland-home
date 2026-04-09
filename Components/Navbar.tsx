@@ -45,7 +45,7 @@ export default function Navbar() {
 
       <div className="flex items-center gap-6 text-lg font-bold text-slate-700 font-[var(--font-nunito)]">
         <Link href="/">Startseite</Link>
-<Link href="/spielzeug">Spielzeug</Link>
+<Link href="/spielzeuge">Spielzeuge</Link>
 <Link href="/schreibwaren">Schreibwaren</Link>
 <Link href="/ueber-uns">Über uns</Link>
 <Link href="/tracking">Tracking</Link>
