@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import Navbar from "@/Components/Navbar";
 
@@ -16,6 +16,7 @@ type Product = {
 
 export default function SchreibwarenPage() {
   const [products, setProducts] = useState<Product[]>([]);
+  const [search, setSearch] = useState("");
   const [selectedDescription, setSelectedDescription] = useState<Product | null>(
     null
   );
@@ -35,22 +36,42 @@ export default function SchreibwarenPage() {
     }
   }, []);
 
+  const filteredProducts = useMemo(() => {
+    return products.filter((product) =>
+      product.name.toLowerCase().includes(search.toLowerCase())
+    );
+  }, [products, search]);
+
   return (
     <main className="min-h-screen bg-[#eef5ff]">
       <Navbar />
 
       <div className="mx-auto max-w-[1800px] px-6 py-8">
-        <h1 className="mb-10 text-5xl font-bold text-pink-500 md:text-6xl">
-          Schreibwaren
-        </h1>
+        <div className="mb-10 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+          <h1 className="text-5xl font-bold text-pink-500 md:text-6xl">
+            Schreibwaren
+          </h1>
 
-        {products.length === 0 ? (
+          <div className="w-full md:w-[360px]">
+            <input
+              type="text"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Produkt suchen..."
+              className="w-full rounded-2xl border border-pink-200 bg-white px-5 py-3 text-sm font-medium text-slate-700 shadow-sm outline-none transition focus:border-pink-400 focus:ring-2 focus:ring-pink-200"
+            />
+          </div>
+        </div>
+
+        {filteredProducts.length === 0 ? (
           <div className="rounded-3xl bg-white p-8 text-center text-lg text-slate-500 shadow-lg">
-            Noch keine Schreibwaren vorhanden.
+            {search
+              ? "Kein passendes Produkt gefunden."
+              : "Noch keine Schreibwaren vorhanden."}
           </div>
         ) : (
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-4 items-stretch">
-            {products.map((product) => (
+            {filteredProducts.map((product) => (
               <div
                 key={product.id}
                 className="flex h-full min-h-[520px] flex-col rounded-[24px] bg-white p-4 shadow-md transition hover:shadow-xl"
