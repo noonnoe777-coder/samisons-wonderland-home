@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Fredoka, Nunito } from "next/font/google";
 import "./globals.css";
 
@@ -17,6 +17,12 @@ const nunito = Nunito({
 export const metadata: Metadata = {
   title: "Samison's Wonderland",
   description: "Toy store and indoor playground",
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  userScalable: true,
 };
 
 export default function RootLayout({
