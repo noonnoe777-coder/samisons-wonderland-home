@@ -72,8 +72,11 @@ export default function StartseitePage(): JSX.Element {
   }, []);
 
   return (
-    <main className="min-h-screen w-screen overflow-x-auto bg-[#eef5ff] px-2 py-4">
-      <div className="mx-auto min-w-[900px] max-w-5xl rounded-3xl bg-white p-4 md:p-10 text-center shadow-xl">
+    <main
+      className="min-h-screen overflow-x-auto overflow-y-auto bg-[#eef5ff] px-2 py-4"
+      style={{ touchAction: "pan-x pan-y pinch-zoom" }}
+    >
+      <div className="w-[1200px] rounded-3xl bg-white p-4 md:p-10 text-center shadow-xl">
         {image && (
           <img
             src={image}
@@ -101,7 +104,7 @@ export default function StartseitePage(): JSX.Element {
         </p>
 
         <p
-          className={`mx-auto max-w-3xl text-slate-600 ${descriptionFont} text-base md:text-xl`}
+          className={`text-slate-600 ${descriptionFont} text-base md:text-xl`}
         >
           {description}
         </p>
