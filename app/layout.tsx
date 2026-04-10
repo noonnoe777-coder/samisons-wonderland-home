@@ -1,6 +1,8 @@
 import type { Metadata, Viewport } from "next";
+import type { ReactNode } from "react";
 import { Fredoka, Nunito } from "next/font/google";
 import "./globals.css";
+import ServiceWorkerCleanup from "./ServiceWorkerCleanup";
 
 const fredoka = Fredoka({
   subsets: ["latin"],
@@ -27,17 +29,18 @@ export const viewport: Viewport = {
   userScalable: true,
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+type RootLayoutProps = {
+  children: ReactNode;
+};
+
+export default function RootLayout({ children }: RootLayoutProps) {
   return (
     <html
       lang="en"
       className={`${fredoka.variable} ${nunito.variable}`}
     >
       <body className="min-h-full flex flex-col bg-white">
+        <ServiceWorkerCleanup />
         {children}
       </body>
     </html>
