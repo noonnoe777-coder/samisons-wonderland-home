@@ -68,17 +68,8 @@ export default function StartseitePage(): JSX.Element {
   }, []);
 
   return (
-    <main
-      style={{
-        width: "1200px",
-        minWidth: "1200px",
-        overflowX: "scroll",
-        overflowY: "auto",
-        touchAction: "pan-x pan-y pinch-zoom",
-      }}
-      className="min-h-screen bg-[#eef5ff] p-4"
-    >
-      <div className="rounded-3xl bg-white p-4 md:p-10 text-center shadow-xl">
+    <main className="min-h-screen bg-[#eef5ff] px-3 py-4 overflow-x-hidden">
+      <div className="w-full max-w-5xl mx-auto rounded-3xl bg-white p-4 md:p-10 text-center shadow-xl">
         {image && (
           <img
             src={image}
@@ -88,25 +79,25 @@ export default function StartseitePage(): JSX.Element {
         )}
 
         <h1
-          className={`mb-2 font-extrabold text-blue-500 ${headlineFont} text-6xl`}
+          className={`mb-2 font-extrabold text-blue-500 ${headlineFont} text-3xl sm:text-4xl md:text-6xl`}
         >
           {headline}
         </h1>
 
         <h2
-          className={`mb-6 font-extrabold text-pink-500 ${dateFont} text-5xl`}
+          className={`mb-6 font-extrabold text-pink-500 ${dateFont} text-2xl sm:text-3xl md:text-5xl`}
         >
           {date}
         </h2>
 
         <p
-          className={`mb-6 font-bold text-slate-700 ${addressFont} text-3xl`}
+          className={`mb-6 font-bold text-slate-700 ${addressFont} text-lg sm:text-xl md:text-3xl`}
         >
           {address}
         </p>
 
         <p
-          className={`text-slate-600 ${descriptionFont} text-xl`}
+          className={`text-slate-600 ${descriptionFont} text-base sm:text-lg md:text-xl`}
         >
           {description}
         </p>
