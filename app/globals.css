@@ -2,54 +2,52 @@
 
 .hero-title {
   font-family: var(--font-fredoka), sans-serif;
-  font-size: clamp(68px, 8vw, 110px);
+  font-size: clamp(42px, 8vw, 90px);
   font-weight: 700;
-  line-height: 0.95;
-  letter-spacing: -2px;
+  line-height: 1;
+  letter-spacing: -1px;
   color: #5f9dff;
   text-align: center;
 
-  /* white outline like the first website */
-  -webkit-text-stroke: 10px white;
+  -webkit-text-stroke: 4px white;
   paint-order: stroke fill;
 
-  /* soft shadow */
   text-shadow:
-    0 4px 0 rgba(255,255,255,0.8),
-    0 8px 20px rgba(116, 146, 255, 0.35);
+    0 2px 0 rgba(255,255,255,0.8),
+    0 6px 16px rgba(116, 146, 255, 0.35);
 }
 
 .hero-date {
   display: block;
   margin-top: 6px;
   font-family: var(--font-fredoka), sans-serif;
-  font-size: clamp(74px, 9vw, 120px);
+  font-size: clamp(46px, 9vw, 100px);
   font-weight: 700;
-  letter-spacing: -2px;
+  letter-spacing: -1px;
   color: #ff67b7;
 
-  -webkit-text-stroke: 10px white;
+  -webkit-text-stroke: 4px white;
   paint-order: stroke fill;
 
   text-shadow:
-    0 4px 0 rgba(255,255,255,0.8),
-    0 8px 20px rgba(255, 128, 188, 0.35);
+    0 2px 0 rgba(255,255,255,0.8),
+    0 6px 16px rgba(255, 128, 188, 0.35);
 }
 
 .hero-text {
-  margin-top: 28px;
+  margin-top: 20px;
   font-family: var(--font-nunito), sans-serif;
-  font-size: clamp(28px, 2.2vw, 42px);
+  font-size: clamp(18px, 4vw, 34px);
   font-weight: 800;
-  line-height: 1.2;
+  line-height: 1.3;
   color: #44507c;
   text-align: center;
 }
 
 .hero-subtext {
-  margin-top: 18px;
+  margin-top: 14px;
   font-family: var(--font-nunito), sans-serif;
-  font-size: clamp(20px, 1.4vw, 28px);
+  font-size: clamp(14px, 3vw, 24px);
   font-weight: 700;
   color: #626f97;
   text-align: center;
@@ -59,37 +57,45 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
+  width: 100%;
+  max-width: 100%;
+  overflow-wrap: break-word;
 }
 
 .hero-title-main {
   font-family: var(--font-fredoka), sans-serif;
-  font-size: clamp(72px, 7vw, 120px);
+  font-size: clamp(42px, 8vw, 95px);
   font-weight: 700;
   line-height: 1;
   color: #3d86ff;
-  letter-spacing: -3px;
+  letter-spacing: -1px;
 
-  -webkit-text-stroke: 12px #ffffff;
+  -webkit-text-stroke: 4px #ffffff;
   paint-order: stroke fill;
 
   text-shadow:
-    0 3px 0 rgba(255,255,255,0.9),
-    0 10px 25px rgba(102, 140, 255, 0.45);
+    0 2px 0 rgba(255,255,255,0.9),
+    0 8px 18px rgba(102, 140, 255, 0.45);
 }
 
 .hero-title-date {
   font-family: var(--font-fredoka), sans-serif;
-  font-size: clamp(82px, 8vw, 135px);
+  font-size: clamp(48px, 9vw, 110px);
   font-weight: 700;
   line-height: 1;
   color: #ff4fb1;
-  letter-spacing: -3px;
+  letter-spacing: -1px;
 
-  -webkit-text-stroke: 12px #ffffff;
+  -webkit-text-stroke: 4px #ffffff;
   paint-order: stroke fill;
 
   text-shadow:
-    0 3px 0 rgba(255,255,255,0.95),
-    0 12px 28px rgba(255, 95, 177, 0.4);
+    0 2px 0 rgba(255,255,255,0.95),
+    0 8px 20px rgba(255, 95, 177, 0.4);
+}
+
+html,
+body {
+  overflow-x: hidden;
 }
