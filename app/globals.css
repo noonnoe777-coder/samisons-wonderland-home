@@ -8,10 +8,8 @@
   letter-spacing: -1px;
   color: #5f9dff;
   text-align: center;
-
   -webkit-text-stroke: 4px white;
   paint-order: stroke fill;
-
   text-shadow:
     0 2px 0 rgba(255,255,255,0.8),
     0 6px 16px rgba(116, 146, 255, 0.35);
@@ -25,10 +23,8 @@
   font-weight: 700;
   letter-spacing: -1px;
   color: #ff67b7;
-
   -webkit-text-stroke: 4px white;
   paint-order: stroke fill;
-
   text-shadow:
     0 2px 0 rgba(255,255,255,0.8),
     0 6px 16px rgba(255, 128, 188, 0.35);
@@ -70,10 +66,8 @@
   line-height: 1;
   color: #3d86ff;
   letter-spacing: -1px;
-
   -webkit-text-stroke: 4px #ffffff;
   paint-order: stroke fill;
-
   text-shadow:
     0 2px 0 rgba(255,255,255,0.9),
     0 8px 18px rgba(102, 140, 255, 0.45);
@@ -86,10 +80,8 @@
   line-height: 1;
   color: #ff4fb1;
   letter-spacing: -1px;
-
   -webkit-text-stroke: 4px #ffffff;
   paint-order: stroke fill;
-
   text-shadow:
     0 2px 0 rgba(255,255,255,0.95),
     0 8px 20px rgba(255, 95, 177, 0.4);
@@ -97,5 +89,6 @@
 
 html,
 body {
-  overflow-x: hidden;
+  overflow-x: auto;
+  touch-action: pan-x pan-y pinch-zoom;
 }
