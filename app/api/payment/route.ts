@@ -1,7 +1,7 @@
 import Stripe from "stripe";
 import { NextResponse } from "next/server";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
   apiVersion: "2025-02-24.acacia",
 });
 
@@ -28,23 +28,16 @@ export async function POST(req: Request) {
         "sepa_debit",
       ],
 
-      // E-Mail direkt im Stripe Checkout vorausfüllen
       customer_email: email,
-
-      // Stripe erstellt automatisch einen Customer
       customer_creation: "always",
 
-      // Stripe darf Name / Adresse nach Checkout speichern
       customer_update: {
         name: "auto",
         address: "auto",
-        shipping: "auto",
       },
 
-      // Rechnungsadresse verpflichtend
       billing_address_collection: "required",
 
-      // Lieferadresse nur Deutschland
       shipping_address_collection: {
         allowed_countries: ["DE"],
       },
@@ -62,7 +55,6 @@ export async function POST(req: Request) {
         },
       ],
 
-      // Dein eigener Name aus dem Formular
       metadata: {
         customer_name: name,
         product_id: String(id),
@@ -82,11 +74,16 @@ export async function POST(req: Request) {
     return NextResponse.json({
       url: session.url,
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error("Stripe Fehler:", error);
 
     return NextResponse.json(
-      { error: "Fehler beim Erstellen der Zahlung." },
+      {
+        error:
+          error?.raw?.message ||
+          error?.message ||
+          "Fehler beim Erstellen der Zahlung.",
+      },
       { status: 500 }
     );
   }
