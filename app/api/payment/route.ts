@@ -49,7 +49,7 @@ export async function POST(req: Request) {
             product_data: {
               name: `Produkt ${id}`,
             },
-            unit_amount: 1999, // 19,99 €
+            unit_amount: 2500, // 25,00 €
           },
           quantity: 1,
         },
