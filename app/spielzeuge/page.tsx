@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import Navbar from "@/Components/Navbar";
+import { supabase } from "@/app/lib/supabase";
 
 type Product = {
   id: number;
@@ -23,17 +24,26 @@ export default function SpielzeugePage() {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
   useEffect(() => {
-    const savedProducts = localStorage.getItem("products");
+    const loadProducts = async () => {
+      const { data, error } = await supabase
+        .from("spielzeuge")
+        .select("*");
 
-    if (savedProducts) {
-      const parsedProducts: Product[] = JSON.parse(savedProducts);
+      if (error) {
+        console.error(error);
+        return;
+      }
 
-      const spielzeugProducts = parsedProducts.filter(
-        (product) => product.category === "Spielzeug"
-      );
+      if (data) {
+        const spielzeugProducts = data.filter(
+          (product) => product.category === "Spielzeug"
+        );
 
-      setProducts(spielzeugProducts);
-    }
+        setProducts(spielzeugProducts);
+      }
+    };
+
+    loadProducts();
   }, []);
 
   const filteredProducts = useMemo(() => {
