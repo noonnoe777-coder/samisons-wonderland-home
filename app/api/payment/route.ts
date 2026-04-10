@@ -21,12 +21,9 @@ export async function POST(req: Request) {
     const session = await stripe.checkout.sessions.create({
       mode: "payment",
 
-      payment_method_types: [
-        "card",
-        "paypal",
-        "klarna",
-        "sepa_debit",
-      ],
+      // Test zuerst nur mit Karte.
+      // Wenn das funktioniert, kannst du später "paypal", "klarna" und "sepa_debit" wieder hinzufügen.
+      payment_method_types: ["card"],
 
       customer_email: email,
       customer_creation: "always",
@@ -60,8 +57,8 @@ export async function POST(req: Request) {
         product_id: String(id),
       },
 
-      success_url: `${process.env.NEXT_PUBLIC_URL}/danke`,
-      cancel_url: `${process.env.NEXT_PUBLIC_URL}/bestellen/${id}`,
+      success_url: `${process.env.NEXT_PUBLIC_URL}/danke?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${process.env.NEXT_PUBLIC_URL}/payment/${id}`,
     });
 
     if (!session.url) {
@@ -75,7 +72,8 @@ export async function POST(req: Request) {
       url: session.url,
     });
   } catch (error: any) {
-    console.error("Stripe Fehler:", error);
+    console.error("FULL STRIPE ERROR:");
+    console.error(JSON.stringify(error, null, 2));
 
     return NextResponse.json(
       {
@@ -83,6 +81,8 @@ export async function POST(req: Request) {
           error?.raw?.message ||
           error?.message ||
           "Fehler beim Erstellen der Zahlung.",
+        code: error?.code || null,
+        type: error?.type || null,
       },
       { status: 500 }
     );
