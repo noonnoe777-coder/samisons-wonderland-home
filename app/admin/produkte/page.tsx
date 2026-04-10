@@ -13,7 +13,6 @@ type Product = {
   price: string;
   description: string;
   image: string | null;
-  video: string | null;
 };
 
 export default function ProdukteAdminPage() {
@@ -24,7 +23,6 @@ export default function ProdukteAdminPage() {
   const [price, setPrice] = useState("");
   const [description, setDescription] = useState("");
   const [image, setImage] = useState<string | null>(null);
-  const [video, setVideo] = useState<string | null>(null);
 
   useEffect(() => {
     loadProducts();
@@ -36,13 +34,19 @@ export default function ProdukteAdminPage() {
       .select("*")
       .order("id", { ascending: false });
 
-    if (!error && data) {
-      setProducts(data as Product[]);
+    if (error) {
+      console.error(error);
+      return;
     }
+
+    setProducts((data as Product[]) || []);
   };
 
   const addProduct = async () => {
-    if (!name || !price || !description) return;
+    if (!name || !price || !description) {
+      alert("Bitte alle Felder ausfüllen");
+      return;
+    }
 
     const { error } = await supabase.from("spielzeuge").insert([
       {
@@ -51,7 +55,6 @@ export default function ProdukteAdminPage() {
         price,
         description,
         image,
-        video,
       },
     ]);
 
@@ -66,7 +69,6 @@ export default function ProdukteAdminPage() {
     setPrice("");
     setDescription("");
     setImage(null);
-    setVideo(null);
 
     loadProducts();
   };
@@ -79,6 +81,7 @@ export default function ProdukteAdminPage() {
 
     if (error) {
       console.error(error);
+      alert("Fehler beim Löschen");
       return;
     }
 
@@ -142,25 +145,11 @@ export default function ProdukteAdminPage() {
                 if (!file) return;
 
                 const reader = new FileReader();
+
                 reader.onloadend = () => {
                   setImage(reader.result as string);
                 };
-                reader.readAsDataURL(file);
-              }}
-              className="rounded-xl border border-slate-200 px-3 py-2 text-sm"
-            />
 
-            <input
-              type="file"
-              accept="video/*"
-              onChange={(e) => {
-                const file = e.target.files?.[0];
-                if (!file) return;
-
-                const reader = new FileReader();
-                reader.onloadend = () => {
-                  setVideo(reader.result as string);
-                };
                 reader.readAsDataURL(file);
               }}
               className="rounded-xl border border-slate-200 px-3 py-2 text-sm"

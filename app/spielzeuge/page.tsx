@@ -12,15 +12,13 @@ type Product = {
   price: string;
   description: string;
   image: string | null;
-  video: string | null;
 };
 
 export default function SpielzeugePage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [search, setSearch] = useState("");
-  const [selectedDescription, setSelectedDescription] = useState<Product | null>(
-    null
-  );
+  const [selectedDescription, setSelectedDescription] =
+    useState<Product | null>(null);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
   useEffect(() => {
@@ -34,13 +32,12 @@ export default function SpielzeugePage() {
         return;
       }
 
-      if (data) {
-        const spielzeugProducts = data.filter(
+      const spielzeugProducts =
+        data?.filter(
           (product) => product.category === "Spielzeug"
-        );
+        ) || [];
 
-        setProducts(spielzeugProducts);
-      }
+      setProducts(spielzeugProducts);
     };
 
     loadProducts();
@@ -80,11 +77,11 @@ export default function SpielzeugePage() {
               : "Noch keine Spielzeuge vorhanden."}
           </div>
         ) : (
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-4 items-stretch">
+          <div className="grid grid-cols-1 items-stretch gap-6 sm:grid-cols-2 xl:grid-cols-4">
             {filteredProducts.map((product) => (
               <div
                 key={product.id}
-                className="flex h-full min-h-[520px] flex-col rounded-[24px] bg-white p-4 shadow-md transition hover:shadow-xl"
+                className="flex min-h-[520px] h-full flex-col rounded-[24px] bg-white p-4 shadow-md transition hover:shadow-xl"
               >
                 {product.image && (
                   <div className="mb-3 flex h-[180px] w-full items-center justify-center overflow-hidden rounded-2xl bg-slate-100">
@@ -93,17 +90,6 @@ export default function SpielzeugePage() {
                       alt={product.name}
                       className="h-full w-full object-contain"
                     />
-                  </div>
-                )}
-
-                {product.video && (
-                  <div className="mb-3 overflow-hidden rounded-2xl">
-                    <video
-                      controls
-                      className="h-[180px] w-full rounded-2xl object-cover"
-                    >
-                      <source src={product.video} type="video/mp4" />
-                    </video>
                   </div>
                 )}
 
