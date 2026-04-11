@@ -81,7 +81,7 @@ export default function SchreibwarenPage() {
             {filteredProducts.map((product) => (
               <div
                 key={product.id}
-                className="mx-auto flex h-full min-h-[420px] w-full max-w-[115px] flex-col rounded-[20px] bg-white p-2 shadow-md transition hover:shadow-xl sm:max-w-none sm:min-h-[520px] sm:p-4"
+                className="mx-auto flex aspect-square h-auto w-full max-w-[115px] flex-col rounded-[20px] bg-white p-2 shadow-md transition hover:shadow-xl sm:max-w-none sm:min-h-[520px] sm:aspect-auto sm:p-4"
               >
                 {product.image && (
                   <div className="mb-2 flex h-[80px] w-full items-center justify-center overflow-hidden rounded-xl bg-slate-100 sm:mb-3 sm:h-[180px] sm:rounded-2xl">
