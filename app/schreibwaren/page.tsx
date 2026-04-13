@@ -21,6 +21,8 @@ export default function SchreibwarenPage() {
     useState<Product | null>(null);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
+  const [quantities, setQuantities] = useState<Record<number, number>>({});
+
   useEffect(() => {
     const loadProducts = async () => {
       const { data, error } = await supabase
@@ -77,14 +79,14 @@ export default function SchreibwarenPage() {
               : "Noch keine Schreibwaren vorhanden."}
           </div>
         ) : (
-          <div className="grid grid-cols-3 gap-2 sm:grid-cols-2 xl:grid-cols-4">
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4">
             {filteredProducts.map((product) => (
               <div
                 key={product.id}
-                className="mx-auto flex aspect-square h-auto w-full max-w-[115px] flex-col rounded-[20px] bg-white p-2 shadow-md transition hover:shadow-xl sm:max-w-none sm:min-h-[520px] sm:aspect-auto sm:p-4"
+                className="mx-auto flex aspect-square w-full max-w-[145px] flex-col rounded-[20px] bg-white p-2 shadow-md transition hover:shadow-xl sm:max-w-none sm:min-h-[480px] sm:aspect-auto sm:p-4"
               >
                 {product.image && (
-                  <div className="mb-2 flex h-[80px] w-full items-center justify-center overflow-hidden rounded-xl bg-slate-100 sm:mb-3 sm:h-[180px] sm:rounded-2xl">
+                  <div className="mb-2 flex h-[95px] w-full items-center justify-center overflow-hidden rounded-xl bg-slate-100 sm:mb-3 sm:h-[180px] sm:rounded-2xl">
                     <img
                       src={product.image}
                       alt={product.name}
@@ -109,26 +111,62 @@ export default function SchreibwarenPage() {
 
                 <div className="flex-1" />
 
-                <div className="space-y-1 sm:space-y-2">
-                  <div className="flex flex-col gap-1 sm:flex-row sm:gap-2">
+                <div className="space-y-1 sm:space-y-1.5">
+                  <div className="flex items-center gap-1 sm:gap-2">
+                    <div className="flex items-center rounded-lg border border-pink-200 bg-white px-1 py-1 sm:rounded-xl sm:px-2 sm:py-2">
+                      <button
+                        onClick={() => {
+                          setQuantities((prev) => ({
+                            ...prev,
+                            [product.id]: Math.max(
+                              (prev[product.id] || 1) - 1,
+                              1
+                            ),
+                          }));
+                        }}
+                        className="flex h-5 w-5 items-center justify-center rounded-md text-[10px] font-bold text-pink-500 transition hover:bg-pink-100 sm:h-6 sm:w-6 sm:text-xs"
+                      >
+                        -
+                      </button>
+
+                      <span className="mx-1 min-w-[16px] text-center text-[8px] font-bold text-slate-700 sm:mx-2 sm:min-w-[20px] sm:text-[11px]">
+                        {quantities[product.id] || 1}
+                      </span>
+
+                      <button
+                        onClick={() => {
+                          setQuantities((prev) => ({
+                            ...prev,
+                            [product.id]:
+                              (prev[product.id] || 1) + 1,
+                          }));
+                        }}
+                        className="flex h-5 w-5 items-center justify-center rounded-md text-[10px] font-bold text-pink-500 transition hover:bg-pink-100 sm:h-6 sm:w-6 sm:text-xs"
+                      >
+                        +
+                      </button>
+                    </div>
+
                     <Link
-                      href={`/bestellen/${product.id}`}
-                      className="flex-1 rounded-lg bg-pink-500 px-2 py-2 text-center text-[8px] font-bold text-white transition hover:bg-pink-600 sm:rounded-xl sm:px-3 sm:py-3 sm:text-xs"
+                      href={`/bestellen/${product.id}?menge=${
+                        quantities[product.id] || 1
+                      }`}
+                      className="flex-1 rounded-lg bg-pink-500 px-1.5 py-1 text-center text-[7px] font-bold text-white transition hover:bg-pink-600 sm:rounded-xl sm:px-2 sm:py-2 sm:text-[11px]"
                     >
                       Jetzt bestellen
                     </Link>
-
-                    <Link
-                      href="/bewerten"
-                      className="flex-1 rounded-lg bg-yellow-400 px-2 py-2 text-center text-[8px] font-bold text-white transition hover:bg-yellow-500 sm:rounded-xl sm:px-3 sm:py-3 sm:text-xs"
-                    >
-                      Bewerten
-                    </Link>
                   </div>
+
+                  <Link
+                    href="/bewerten"
+                    className="block w-full rounded-lg bg-yellow-400 px-1.5 py-1 text-center text-[7px] font-bold text-white transition hover:bg-yellow-500 sm:rounded-xl sm:px-2 sm:py-2 sm:text-[11px]"
+                  >
+                    Bewerten
+                  </Link>
 
                   <button
                     onClick={() => setSelectedDescription(product)}
-                    className="w-full rounded-lg border border-pink-200 px-2 py-2 text-[8px] font-bold text-pink-500 transition hover:bg-pink-50 sm:rounded-xl sm:px-3 sm:py-3 sm:text-xs"
+                    className="w-full rounded-lg border border-pink-200 px-1.5 py-1 text-[7px] font-bold text-pink-500 transition hover:bg-pink-50 sm:rounded-xl sm:px-2 sm:py-2 sm:text-[11px]"
                   >
                     Beschreibung ansehen
                   </button>
@@ -136,7 +174,7 @@ export default function SchreibwarenPage() {
                   {product.image && (
                     <button
                       onClick={() => setSelectedImage(product.image)}
-                      className="w-full rounded-lg border border-blue-200 px-2 py-2 text-[8px] font-bold text-blue-500 transition hover:bg-blue-50 sm:rounded-xl sm:px-3 sm:py-3 sm:text-xs"
+                      className="w-full rounded-lg border border-blue-200 px-1.5 py-1 text-[7px] font-bold text-blue-500 transition hover:bg-blue-50 sm:rounded-xl sm:px-2 sm:py-2 sm:text-[11px]"
                     >
                       Produktbild ansehen
                     </button>
