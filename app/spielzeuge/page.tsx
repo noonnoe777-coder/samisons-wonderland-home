@@ -275,14 +275,20 @@ export default function SpielzeugePage() {
       )}
 
       {selectedImage && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
-          <div className="relative w-full max-w-6xl rounded-[32px] bg-white p-4 shadow-2xl sm:p-5">
-            <button
-              onClick={() => setSelectedImage(null)}
-              className="absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-full bg-blue-100 text-xl font-bold text-blue-500 transition hover:bg-blue-200"
-            >
-              ×
-            </button>
+  <div
+    className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
+    onClick={() => setSelectedImage(null)}
+  >
+    <div
+      className="relative w-full max-w-6xl rounded-[32px] bg-white p-4 shadow-2xl sm:p-5"
+      onClick={(e) => e.stopPropagation()}
+    >
+      <button
+        onClick={() => setSelectedImage(null)}
+        className="absolute right-4 top-4 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-blue-100 text-xl font-bold text-blue-500 transition hover:bg-blue-200"
+      >
+        ×
+      </button>
 
             <div className="aspect-square w-full overflow-hidden rounded-3xl bg-slate-100">
               <img
