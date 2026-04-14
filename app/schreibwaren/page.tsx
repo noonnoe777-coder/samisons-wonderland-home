@@ -12,14 +12,18 @@ type Product = {
   price: string;
   description: string;
   image: string | null;
+  video: string | null;
 };
 
 export default function SchreibwarenPage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [search, setSearch] = useState("");
+
   const [selectedDescription, setSelectedDescription] =
     useState<Product | null>(null);
+
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [selectedVideo, setSelectedVideo] = useState<string | null>(null);
 
   const [quantities, setQuantities] = useState<Record<number, number>>({});
   const [notes, setNotes] = useState<Record<number, string>>({});
@@ -39,7 +43,7 @@ export default function SchreibwarenPage() {
 
       const schreibwarenProducts =
         data?.filter(
-          (product) => product.category === "Schreibwaren"
+          (product: Product) => product.category === "Schreibwaren"
         ) || [];
 
       setProducts(schreibwarenProducts);
@@ -89,12 +93,21 @@ export default function SchreibwarenPage() {
                 className="flex w-full flex-col overflow-hidden rounded-[24px] bg-white shadow-xl transition hover:-translate-y-1 hover:shadow-2xl"
               >
                 {product.image && (
-                  <div className="aspect-square w-full overflow-hidden bg-slate-100">
+                  <div className="relative aspect-square w-full overflow-hidden bg-slate-100">
                     <img
                       src={product.image}
                       alt={product.name}
                       className="h-full w-full object-cover"
                     />
+
+                    {product.video && (
+                      <button
+                        onClick={() => setSelectedVideo(product.video)}
+                        className="absolute bottom-3 right-3 flex h-11 w-11 items-center justify-center rounded-full bg-black/70 text-lg font-bold text-white transition hover:scale-110"
+                      >
+                        ▶
+                      </button>
+                    )}
                   </div>
                 )}
 
@@ -183,8 +196,7 @@ export default function SchreibwarenPage() {
                           onClick={() => {
                             setQuantities((prev) => ({
                               ...prev,
-                              [product.id]:
-                                (prev[product.id] || 1) + 1,
+                              [product.id]: (prev[product.id] || 1) + 1,
                             }));
                           }}
                           className="flex h-7 w-7 items-center justify-center rounded-lg text-sm font-bold text-pink-500 transition hover:bg-pink-100"
@@ -275,20 +287,20 @@ export default function SchreibwarenPage() {
       )}
 
       {selectedImage && (
-  <div
-    className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
-    onClick={() => setSelectedImage(null)}
-  >
-    <div
-      className="relative w-full max-w-6xl rounded-[32px] bg-white p-4 shadow-2xl sm:p-5"
-      onClick={(e) => e.stopPropagation()}
-    >
-      <button
-        onClick={() => setSelectedImage(null)}
-        className="absolute right-4 top-4 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-blue-100 text-xl font-bold text-blue-500 transition hover:bg-blue-200"
-      >
-        ×
-      </button>
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
+          onClick={() => setSelectedImage(null)}
+        >
+          <div
+            className="relative w-full max-w-6xl rounded-[32px] bg-white p-4 shadow-2xl sm:p-5"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              onClick={() => setSelectedImage(null)}
+              className="absolute right-4 top-4 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-blue-100 text-xl font-bold text-blue-500 transition hover:bg-blue-200"
+            >
+              ×
+            </button>
 
             <div className="aspect-square w-full overflow-hidden rounded-3xl bg-slate-100">
               <img
@@ -297,6 +309,29 @@ export default function SchreibwarenPage() {
                 className="h-full w-full object-cover"
               />
             </div>
+          </div>
+        </div>
+      )}
+
+      {selectedVideo && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4"
+          onClick={() => setSelectedVideo(null)}
+        >
+          <div
+            className="relative w-full max-w-3xl rounded-[32px] bg-white p-4 shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              onClick={() => setSelectedVideo(null)}
+              className="absolute right-4 top-4 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-black text-xl font-bold text-white"
+            >
+              ×
+            </button>
+
+            <video controls autoPlay className="w-full rounded-3xl">
+              <source src={selectedVideo} type="video/mp4" />
+            </video>
           </div>
         </div>
       )}

@@ -13,6 +13,7 @@ type Product = {
   price: string;
   description: string;
   image: string | null;
+  video: string | null;
 };
 
 export default function ProdukteAdminPage() {
@@ -23,6 +24,7 @@ export default function ProdukteAdminPage() {
   const [price, setPrice] = useState("");
   const [description, setDescription] = useState("");
   const [image, setImage] = useState<string | null>(null);
+  const [video, setVideo] = useState<string | null>(null);
 
   useEffect(() => {
     loadProducts();
@@ -55,6 +57,7 @@ export default function ProdukteAdminPage() {
         price,
         description,
         image,
+        video,
       },
     ]);
 
@@ -69,6 +72,7 @@ export default function ProdukteAdminPage() {
     setPrice("");
     setDescription("");
     setImage(null);
+    setVideo(null);
 
     loadProducts();
   };
@@ -155,6 +159,30 @@ export default function ProdukteAdminPage() {
               className="rounded-xl border border-slate-200 px-3 py-2 text-sm"
             />
 
+            <input
+              type="file"
+              accept="video/*"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (!file) return;
+
+                const reader = new FileReader();
+
+                reader.onloadend = () => {
+                  setVideo(reader.result as string);
+                };
+
+                reader.readAsDataURL(file);
+              }}
+              className="rounded-xl border border-slate-200 px-3 py-2 text-sm"
+            />
+
+            {video && (
+              <div className="rounded-xl border border-pink-200 bg-pink-50 px-3 py-2 text-sm text-pink-500">
+                Video ausgewählt
+              </div>
+            )}
+
             <button
               onClick={addProduct}
               className="self-start rounded-full bg-yellow-400 px-5 py-2 text-sm font-bold text-white shadow transition hover:scale-105"
@@ -165,61 +193,56 @@ export default function ProdukteAdminPage() {
         </div>
 
         <div className="mt-6 grid grid-cols-1 gap-4 lg:grid-cols-2">
-          <div className="rounded-2xl bg-white p-4 shadow-md">
-            <h2 className="mb-3 text-2xl font-bold text-blue-500">
-              Spielzeug
-            </h2>
+          {(["Spielzeug", "Schreibwaren"] as ProductCategory[]).map(
+            (currentCategory) => (
+              <div
+                key={currentCategory}
+                className="rounded-2xl bg-white p-4 shadow-md"
+              >
+                <h2
+                  className={`mb-3 text-2xl font-bold ${
+                    currentCategory === "Spielzeug"
+                      ? "text-blue-500"
+                      : "text-pink-500"
+                  }`}
+                >
+                  {currentCategory}
+                </h2>
 
-            <div className="flex flex-col gap-2">
-              {products
-                .filter((product) => product.category === "Spielzeug")
-                .map((product) => (
-                  <div
-                    key={product.id}
-                    className="flex items-center justify-between rounded-xl border border-slate-100 bg-slate-50 px-3 py-2"
-                  >
-                    <span className="truncate text-sm font-medium text-slate-700">
-                      {product.name}
-                    </span>
+                <div className="flex flex-col gap-2">
+                  {products
+                    .filter(
+                      (product) => product.category === currentCategory
+                    )
+                    .map((product) => (
+                      <div
+                        key={product.id}
+                        className="flex items-center justify-between rounded-xl border border-slate-100 bg-slate-50 px-3 py-2"
+                      >
+                        <div className="flex flex-col">
+                          <span className="truncate text-sm font-medium text-slate-700">
+                            {product.name}
+                          </span>
 
-                    <button
-                      onClick={() => deleteProduct(product.id)}
-                      className="rounded-full bg-pink-500 px-3 py-1 text-xs font-bold text-white"
-                    >
-                      Löschen
-                    </button>
-                  </div>
-                ))}
-            </div>
-          </div>
+                          {product.video && (
+                            <span className="text-xs font-medium text-pink-500">
+                              Video vorhanden
+                            </span>
+                          )}
+                        </div>
 
-          <div className="rounded-2xl bg-white p-4 shadow-md">
-            <h2 className="mb-3 text-2xl font-bold text-pink-500">
-              Schreibwaren
-            </h2>
-
-            <div className="flex flex-col gap-2">
-              {products
-                .filter((product) => product.category === "Schreibwaren")
-                .map((product) => (
-                  <div
-                    key={product.id}
-                    className="flex items-center justify-between rounded-xl border border-slate-100 bg-slate-50 px-3 py-2"
-                  >
-                    <span className="truncate text-sm font-medium text-slate-700">
-                      {product.name}
-                    </span>
-
-                    <button
-                      onClick={() => deleteProduct(product.id)}
-                      className="rounded-full bg-pink-500 px-3 py-1 text-xs font-bold text-white"
-                    >
-                      Löschen
-                    </button>
-                  </div>
-                ))}
-            </div>
-          </div>
+                        <button
+                          onClick={() => deleteProduct(product.id)}
+                          className="rounded-full bg-pink-500 px-3 py-1 text-xs font-bold text-white"
+                        >
+                          Löschen
+                        </button>
+                      </div>
+                    ))}
+                </div>
+              </div>
+            )
+          )}
         </div>
       </div>
     </main>
