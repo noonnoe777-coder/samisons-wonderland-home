@@ -8,66 +8,115 @@ export default function AdminBewertungenPage() {
   const [bearbeiten, setBearbeiten] = useState<number | null>(null);
 
   useEffect(() => {
-    const gespeichert = localStorage.getItem("bewertungen");
-    if (gespeichert) {
-      setBewertungen(JSON.parse(gespeichert));
-    }
+    const laden = async () => {
+      const { data, error } = await supabase
+        .from("bewertungen")
+        .select("*")
+        .order("id", { ascending: false });
+
+      if (error) {
+        console.error(error);
+        return;
+      }
+
+      setBewertungen(data || []);
+    };
+
+    laden();
   }, []);
 
-  function speichern() {
-    localStorage.setItem("bewertungen", JSON.stringify(bewertungen));
+  async function speichern(id: number) {
+    const bewertung = bewertungen.find((b) => b.id === id);
+
+    if (!bewertung) return;
+
+    const { error } = await supabase
+      .from("bewertungen")
+      .update({
+        name: bewertung.name,
+        text: bewertung.text,
+        sterne: bewertung.sterne,
+        antwort: bewertung.antwort,
+      })
+      .eq("id", id);
+
+    if (error) {
+      console.error(error);
+      return;
+    }
+
     setBearbeiten(null);
   }
 
-  function loeschen(index: number) {
-    const neueListe = bewertungen.filter((_, i) => i !== index);
-    setBewertungen(neueListe);
-    localStorage.setItem("bewertungen", JSON.stringify(neueListe));
+  async function loeschen(id: number) {
+    const { error } = await supabase
+      .from("bewertungen")
+      .delete()
+      .eq("id", id);
+
+    if (error) {
+      console.error(error);
+      return;
+    }
+
+    setBewertungen((prev) => prev.filter((b) => b.id !== id));
   }
 
   return (
     <div className="min-h-screen bg-slate-100 p-8">
-      <div className="max-w-3xl mx-auto bg-white p-6 rounded-3xl shadow-xl">
-        <h1 className="text-3xl font-bold mb-6">Admin – Bewertungen</h1>
+      <div className="mx-auto max-w-3xl rounded-3xl bg-white p-6 shadow-xl">
+        <h1 className="mb-6 text-3xl font-bold">Admin – Bewertungen</h1>
 
         {bewertungen.length === 0 && (
           <p>Noch keine Bewertungen vorhanden.</p>
         )}
 
-        {bewertungen.map((b, index) => (
+        {bewertungen.map((b) => (
           <div
-            key={index}
-            className="border rounded-2xl p-4 mb-4 bg-slate-50"
+            key={b.id}
+            className="mb-4 rounded-2xl border bg-slate-50 p-4"
           >
-            {bearbeiten === index ? (
+            {bearbeiten === b.id ? (
               <>
                 <input
-                  className="w-full border rounded-xl p-2 mb-2"
+                  className="mb-2 w-full rounded-xl border p-2"
                   value={b.name}
                   onChange={(e) => {
-                    const neu = [...bewertungen];
-                    neu[index].name = e.target.value;
-                    setBewertungen(neu);
+                    setBewertungen((prev) =>
+                      prev.map((item) =>
+                        item.id === b.id
+                          ? { ...item, name: e.target.value }
+                          : item
+                      )
+                    );
                   }}
                 />
 
                 <textarea
-                  className="w-full border rounded-xl p-2 mb-2"
+                  className="mb-2 w-full rounded-xl border p-2"
                   value={b.text}
                   onChange={(e) => {
-                    const neu = [...bewertungen];
-                    neu[index].text = e.target.value;
-                    setBewertungen(neu);
+                    setBewertungen((prev) =>
+                      prev.map((item) =>
+                        item.id === b.id
+                          ? { ...item, text: e.target.value }
+                          : item
+                      )
+                    );
                   }}
                 />
 
                 <select
-                  className="w-full border rounded-xl p-2 mb-3"
+                  className="mb-3 w-full rounded-xl border p-2"
                   value={b.sterne}
                   onChange={(e) => {
-                    const neu = [...bewertungen];
-                    neu[index].sterne = Number(e.target.value);
-                    setBewertungen(neu);
+                    setBewertungen((prev) =>
+                      prev.map((item) =>
+                        item.id === b.id
+                          ? { ...item, sterne: Number(e.target.value) }
+                          : item
+                      )
+                    );
                   }}
                 >
                   <option value={5}>5 Sterne</option>
@@ -78,19 +127,23 @@ export default function AdminBewertungenPage() {
                 </select>
 
                 <textarea
-                  className="w-full border rounded-xl p-2 mb-3"
+                  className="mb-3 w-full rounded-xl border p-2"
                   placeholder="Antwort an den Kunden"
                   value={b.antwort || ""}
                   onChange={(e) => {
-                    const neu = [...bewertungen];
-                    neu[index].antwort = e.target.value;
-                    setBewertungen(neu);
+                    setBewertungen((prev) =>
+                      prev.map((item) =>
+                        item.id === b.id
+                          ? { ...item, antwort: e.target.value }
+                          : item
+                      )
+                    );
                   }}
                 />
 
                 <button
-                  onClick={speichern}
-                  className="bg-green-600 text-white px-4 py-2 rounded-xl mr-2"
+                  onClick={() => speichern(b.id)}
+                  className="mr-2 rounded-xl bg-green-600 px-4 py-2 text-white"
                 >
                   Speichern
                 </button>
@@ -99,14 +152,14 @@ export default function AdminBewertungenPage() {
               <>
                 <div className="font-bold">{b.name}</div>
 
-                <div className="text-yellow-500 mb-2">
+                <div className="mb-2 text-yellow-500">
                   {"⭐".repeat(b.sterne)}
                 </div>
 
                 <div className="mb-4">{b.text}</div>
 
                 {b.antwort && (
-                  <div className="bg-blue-50 border border-blue-200 rounded-xl p-3 mb-4">
+                  <div className="mb-4 rounded-xl border border-blue-200 bg-blue-50 p-3">
                     <div className="font-bold text-blue-700">
                       Deine Antwort:
                     </div>
@@ -115,8 +168,8 @@ export default function AdminBewertungenPage() {
                 )}
 
                 <button
-                  onClick={() => setBearbeiten(index)}
-                  className="bg-blue-600 text-white px-4 py-2 rounded-xl mr-2"
+                  onClick={() => setBearbeiten(b.id)}
+                  className="mr-2 rounded-xl bg-blue-600 px-4 py-2 text-white"
                 >
                   Bearbeiten
                 </button>
@@ -124,8 +177,8 @@ export default function AdminBewertungenPage() {
             )}
 
             <button
-              onClick={() => loeschen(index)}
-              className="bg-red-600 text-white px-4 py-2 rounded-xl"
+              onClick={() => loeschen(b.id)}
+              className="rounded-xl bg-red-600 px-4 py-2 text-white"
             >
               Löschen
             </button>

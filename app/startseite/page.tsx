@@ -41,36 +41,47 @@ export default function StartseitePage(): JSX.Element {
   const [image, setImage] = useState<string | null>(null);
 
   useEffect(() => {
-    const saved = localStorage.getItem("startseiteData");
+    const loadStartseite = async () => {
+      const { data, error } = await supabase
+        .from("startseite_data")
+        .select("*")
+        .eq("id", 1)
+        .single();
 
-    if (saved) {
-      const data: StartseiteData = JSON.parse(saved);
+      if (error) {
+        console.error(error);
+        return;
+      }
 
-      setHeadline(data.headline ?? "Neueröffnung am");
-      setHeadlineFont(data.headlineFont ?? fredoka.className);
+      if (!data) return;
 
-      setDate(data.date ?? "15.11.2025!");
-      setDateFont(data.dateFont ?? fredoka.className);
+      setHeadline(data.headline || "Neueröffnung am");
+      setHeadlineFont(data.headline_font || fredoka.className);
+
+      setDate(data.date || "15.11.2025!");
+      setDateFont(data.date_font || fredoka.className);
 
       setAddress(
-        data.address ??
+        data.address ||
           "Besucht uns auf der Blumenstraße 7, 69168 Wiesloch Baden-Württemberg."
       );
-      setAddressFont(data.addressFont ?? "font-sans");
+      setAddressFont(data.address_font || "font-sans");
 
       setDescription(
-        data.description ??
+        data.description ||
           "Willkommen bei SAMISON'S WONDERLAND – eure magische Spielzeugwelt voller Abenteuer, Farben und Spaß!"
       );
-      setDescriptionFont(data.descriptionFont ?? "font-sans");
+      setDescriptionFont(data.description_font || "font-sans");
 
-      setImage(data.image ?? null);
-    }
+      setImage(data.image || null);
+    };
+
+    loadStartseite();
   }, []);
 
   return (
-    <main className="min-h-screen bg-[#eef5ff] px-3 py-4 overflow-x-hidden">
-      <div className="w-full max-w-5xl mx-auto rounded-3xl bg-white p-4 md:p-10 text-center shadow-xl">
+    <main className="min-h-screen overflow-x-hidden bg-[#eef5ff] px-3 py-4">
+      <div className="mx-auto w-full max-w-5xl rounded-3xl bg-white p-4 text-center shadow-xl md:p-10">
         {image && (
           <img
             src={image}
@@ -80,25 +91,25 @@ export default function StartseitePage(): JSX.Element {
         )}
 
         <h1
-          className={`mb-2 font-extrabold text-blue-500 ${headlineFont} text-3xl sm:text-4xl md:text-6xl`}
+          className={`mb-2 text-3xl font-extrabold text-blue-500 sm:text-4xl md:text-6xl ${headlineFont}`}
         >
           {headline}
         </h1>
 
         <h2
-          className={`mb-6 font-extrabold text-pink-500 ${dateFont} text-2xl sm:text-3xl md:text-5xl`}
+          className={`mb-6 text-2xl font-extrabold text-pink-500 sm:text-3xl md:text-5xl ${dateFont}`}
         >
           {date}
         </h2>
 
         <p
-          className={`mb-6 font-bold text-slate-700 ${addressFont} text-lg sm:text-xl md:text-3xl`}
+          className={`mb-6 text-lg font-bold text-slate-700 sm:text-xl md:text-3xl ${addressFont}`}
         >
           {address}
         </p>
 
         <p
-          className={`text-slate-600 ${descriptionFont} text-base sm:text-lg md:text-xl`}
+          className={`text-base text-slate-600 sm:text-lg md:text-xl ${descriptionFont}`}
         >
           {description}
         </p>

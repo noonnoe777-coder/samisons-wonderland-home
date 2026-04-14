@@ -10,16 +10,6 @@ const fredoka = Fredoka({
   weight: ["400", "500", "600", "700"],
 });
 
-type JetztMehrErfahrenData = {
-  title?: string;
-  titleFont?: string;
-  titleSize?: string;
-  text?: string;
-  textFont?: string;
-  textSize?: string;
-  images?: string[];
-};
-
 export default function JetztMehrErfahrenPage() {
   const [title, setTitle] = useState("Unsere magische Welt");
   const [titleFont, setTitleFont] = useState(fredoka.className);
@@ -34,24 +24,35 @@ export default function JetztMehrErfahrenPage() {
   const [images, setImages] = useState<string[]>([]);
 
   useEffect(() => {
-    const saved = localStorage.getItem("jetztMehrErfahrenData");
+    const loadData = async () => {
+      const { data, error } = await supabase
+        .from("jetzt_mehr_erfahren")
+        .select("*")
+        .eq("id", 1)
+        .single();
 
-    if (saved) {
-      const data: JetztMehrErfahrenData = JSON.parse(saved);
+      if (error) {
+        console.error(error);
+        return;
+      }
 
-      setTitle(data.title || "Unsere magische Welt");
-      setTitleFont(data.titleFont || fredoka.className);
-      setTitleSize(data.titleSize || "text-6xl");
+      if (data) {
+        setTitle(data.title || "Unsere magische Welt");
+        setTitleFont(data.title_font || fredoka.className);
+        setTitleSize(data.title_size || "text-6xl");
 
-      setText(
-        data.text ||
-          "Bei SAMISON'S WONDERLAND erwartet euch eine bunte Welt voller Spielzeug, Abenteuer und Spaß!"
-      );
-      setTextFont(data.textFont || "font-sans");
-      setTextSize(data.textSize || "text-2xl");
+        setText(
+          data.text ||
+            "Bei SAMISON'S WONDERLAND erwartet euch eine bunte Welt voller Spielzeug, Abenteuer und Spaß!"
+        );
+        setTextFont(data.text_font || "font-sans");
+        setTextSize(data.text_size || "text-2xl");
 
-      setImages(data.images || []);
-    }
+        setImages(data.images || []);
+      }
+    };
+
+    loadData();
   }, []);
 
   return (

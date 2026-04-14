@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Navbar from "@/Components/Navbar";
 import { supabase } from "@/app/lib/supabase";
 
@@ -13,6 +13,7 @@ type TrackingStatus =
   | "Erledigt";
 
 type Shipment = {
+  id: number;
   orderNumber: string;
   customer: string;
   estimatedDate: string;
@@ -22,55 +23,54 @@ type Shipment = {
 };
 
 export default function TrackingAdminPage() {
-  const [shipments, setShipments] = useState<Shipment[]>([
-    {
-      orderNumber: "SW-1001",
-      customer: "Anna Müller",
-      estimatedDate: "08.04.2026",
-      shippingCompany: "DHL",
-      trackingNumber: "00340434161094000001",
-      status: "Noch nicht verschickt",
-    },
-    {
-      orderNumber: "SW-1002",
-      customer: "Sophie Becker",
-      estimatedDate: "09.04.2026",
-      shippingCompany: "Hermes",
-      trackingNumber: "H1234567890123456789",
-      status: "Unterwegs",
-    },
-    {
-      orderNumber: "SW-1003",
-      customer: "Laura Wagner",
-      estimatedDate: "10.04.2026",
-      shippingCompany: "DPD",
-      trackingNumber: "05224987654321",
-      status: "Erledigt",
-    },
-  ]);
+  const [shipments, setShipments] = useState<Shipment[]>([]);
 
-  const updateStatus = (
-    orderNumber: string,
+  useEffect(() => {
+    const loadShipments = async () => {
+      const { data, error } = await supabase
+        .from("tracking")
+        .select("*")
+        .order("id", { ascending: false });
+
+      if (error) {
+        console.error(error);
+        return;
+      }
+
+      setShipments(data || []);
+    };
+
+    loadShipments();
+  }, []);
+
+  const updateStatus = async (
+    id: number,
     newStatus: TrackingStatus
   ) => {
-    setShipments((prev) =>
-      prev.map((shipment) => {
-        if (shipment.orderNumber !== orderNumber) return shipment;
+    const finalStatus =
+      newStatus === "Verschickt" ? "Unterwegs" : newStatus;
 
-        // Wenn "Verschickt" gewählt wird,
-        // zeigen wir automatisch die Tracking-Leiste
-        if (newStatus === "Verschickt") {
-          return {
-            ...shipment,
-            status: "Unterwegs",
-          };
-        }
-
-        return {
-          ...shipment,
-          status: newStatus,
-        };
+    const { error } = await supabase
+      .from("tracking")
+      .update({
+        status: finalStatus,
       })
+      .eq("id", id);
+
+    if (error) {
+      console.error(error);
+      return;
+    }
+
+    setShipments((prev) =>
+      prev.map((shipment) =>
+        shipment.id === id
+          ? {
+              ...shipment,
+              status: finalStatus,
+            }
+          : shipment
+      )
     );
   };
 
@@ -117,7 +117,7 @@ export default function TrackingAdminPage() {
             <tbody>
               {shipments.map((shipment) => (
                 <tr
-                  key={shipment.orderNumber}
+                  key={shipment.id}
                   className="border-t border-slate-100 align-top"
                 >
                   <td className="px-6 py-5 font-bold text-blue-500">
@@ -138,7 +138,7 @@ export default function TrackingAdminPage() {
                         }
                         onChange={(e) =>
                           updateStatus(
-                            shipment.orderNumber,
+                            shipment.id,
                             e.target.value as TrackingStatus
                           )
                         }

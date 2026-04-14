@@ -3,7 +3,6 @@ import type { ReactNode } from "react";
 import { Fredoka, Nunito } from "next/font/google";
 import "./globals.css";
 import ServiceWorkerCleanup from "./ServiceWorkerCleanup";
-import { supabase } from "@/app/lib/supabase";
 
 const fredoka = Fredoka({
   subsets: ["latin"],

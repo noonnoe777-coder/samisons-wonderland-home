@@ -1,62 +1,92 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { supabase } from "@/app/lib/supabase";
 
-export default function BewertenPage() {
-  const [bewertungen, setBewertungen] = useState([
-    {
-      name: "Max",
-      text: "Tolles Produkt!",
-      sterne: 5,
-    },
-  ]);
+type Bewertung = {
+  id: number;
+  name: string;
+  text: string;
+  sterne: number;
+  antwort?: string;
+};
 
+export default function BewertenPage() {
+  const [bewertungen, setBewertungen] = useState<Bewertung[]>([]);
   const [name, setName] = useState("");
   const [text, setText] = useState("");
   const [sterne, setSterne] = useState(5);
 
-  function absenden() {
+  useEffect(() => {
+    const loadBewertungen = async () => {
+      const { data, error } = await supabase
+        .from("bewertungen")
+        .select("*")
+        .order("id", { ascending: false });
+
+      if (error) {
+        console.error(error);
+        return;
+      }
+
+      setBewertungen(data || []);
+    };
+
+    loadBewertungen();
+  }, []);
+
+  const absenden = async () => {
     if (!name || !text) return;
 
-    setBewertungen([
-      ...bewertungen,
-      {
-        name,
-        text,
-        sterne,
-      },
-    ]);
+    const neueBewertung = {
+      id: Date.now(),
+      name,
+      text,
+      sterne,
+      antwort: "",
+    };
+
+    const { error } = await supabase
+      .from("bewertungen")
+      .insert([neueBewertung]);
+
+    if (error) {
+      console.error(error);
+      alert("Bewertung konnte nicht gespeichert werden.");
+      return;
+    }
+
+    setBewertungen([neueBewertung, ...bewertungen]);
 
     setName("");
     setText("");
     setSterne(5);
-  }
+  };
 
   return (
     <div className="min-h-screen bg-slate-100 p-8">
-      <div className="max-w-2xl mx-auto bg-white rounded-3xl p-6 shadow-xl">
-        <h1 className="text-3xl font-bold mb-6">Produkt bewerten</h1>
+      <div className="mx-auto max-w-2xl rounded-3xl bg-white p-6 shadow-xl">
+        <h1 className="mb-6 text-3xl font-bold">Produkt bewerten</h1>
 
         <input
           type="text"
           placeholder="Dein Name"
           value={name}
           onChange={(e) => setName(e.target.value)}
-          className="w-full border rounded-xl p-3 mb-4"
+          className="mb-4 w-full rounded-xl border p-3"
         />
 
         <textarea
           placeholder="Deine Bewertung"
           value={text}
           onChange={(e) => setText(e.target.value)}
-          className="w-full border rounded-xl p-3 mb-4 h-32"
+          className="mb-4 h-32 w-full rounded-xl border p-3"
         />
 
         <select
           value={sterne}
           onChange={(e) => setSterne(Number(e.target.value))}
-          className="w-full border rounded-xl p-3 mb-4"
+          className="mb-4 w-full rounded-xl border p-3"
         >
           <option value={5}>5 Sterne</option>
           <option value={4}>4 Sterne</option>
@@ -67,24 +97,35 @@ export default function BewertenPage() {
 
         <button
           onClick={absenden}
-          className="bg-pink-500 text-white px-6 py-3 rounded-full font-bold hover:bg-pink-600"
+          className="rounded-full bg-pink-500 px-6 py-3 font-bold text-white hover:bg-pink-600"
         >
           Bewertung absenden
         </button>
 
         <div className="mt-8">
-          <h2 className="text-2xl font-bold mb-4">Alle Bewertungen</h2>
+          <h2 className="mb-4 text-2xl font-bold">Alle Bewertungen</h2>
 
-          {bewertungen.map((b, index) => (
+          {bewertungen.map((b) => (
             <div
-              key={index}
-              className="border rounded-2xl p-4 mb-4 bg-slate-50"
+              key={b.id}
+              className="mb-4 rounded-2xl border bg-slate-50 p-4"
             >
               <div className="font-bold">{b.name}</div>
-              <div className="text-yellow-500 mb-2">
+
+              <div className="mb-2 text-yellow-500">
                 {"⭐".repeat(b.sterne)}
               </div>
+
               <div>{b.text}</div>
+
+              {b.antwort && (
+                <div className="mt-4 rounded-xl border border-blue-200 bg-blue-50 p-3">
+                  <div className="font-bold text-blue-700">
+                    Antwort vom Shop:
+                  </div>
+                  <div>{b.antwort}</div>
+                </div>
+              )}
             </div>
           ))}
         </div>

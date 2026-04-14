@@ -44,40 +44,62 @@ export default function UeberUnsAdminPage() {
   ];
 
   useEffect(() => {
-    const savedData = localStorage.getItem("ueberUns");
+    const loadData = async () => {
+      const { data, error } = await supabase
+        .from("ueber_uns")
+        .select("*")
+        .eq("id", 1)
+        .single();
 
-    if (!savedData) return;
+      if (error) {
+        console.error(error);
+        return;
+      }
 
-    const data = JSON.parse(savedData);
+      if (data) {
+        setTitle(
+          data.title || "Willkommen bei SAMISON'S WONDERLAND"
+        );
+        setTitleFont(data.title_font || fredoka.className);
+        setTitleSize(data.title_size || "text-4xl");
 
-    setTitle(data.title || "Willkommen bei SAMISON'S WONDERLAND");
-    setTitleFont(data.titleFont || fredoka.className);
-    setTitleSize(data.titleSize || "text-4xl");
+        setDescription(
+          data.description ||
+            "Hier findest du liebevoll ausgewähltes Spielzeug und wunderschöne Schreibwaren für Kinder."
+        );
+        setDescriptionFont(data.description_font || "font-sans");
+        setDescriptionSize(data.description_size || "text-xl");
 
-    setDescription(
-      data.description ||
-        "Hier findest du liebevoll ausgewähltes Spielzeug und wunderschöne Schreibwaren für Kinder."
-    );
-    setDescriptionFont(data.descriptionFont || "font-sans");
-    setDescriptionSize(data.descriptionSize || "text-xl");
-
-    setImage(data.image || null);
-    setVideo(data.video || null);
-  }, []);
-
-  const handleSave = () => {
-    const data = {
-      title,
-      titleFont,
-      titleSize,
-      description,
-      descriptionFont,
-      descriptionSize,
-      image,
-      video,
+        setImage(data.image || null);
+        setVideo(data.video || null);
+      }
     };
 
-    localStorage.setItem("ueberUns", JSON.stringify(data));
+    loadData();
+  }, []);
+
+  const handleSave = async () => {
+    const { error } = await supabase
+      .from("ueber_uns")
+      .upsert([
+        {
+          id: 1,
+          title,
+          title_font: titleFont,
+          title_size: titleSize,
+          description,
+          description_font: descriptionFont,
+          description_size: descriptionSize,
+          image,
+          video,
+        },
+      ]);
+
+    if (error) {
+      console.error(error);
+      alert("Fehler beim Speichern");
+      return;
+    }
 
     alert("Erfolgreich gespeichert!");
   };

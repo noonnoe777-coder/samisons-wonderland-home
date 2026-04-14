@@ -49,59 +49,76 @@ export default function StartseiteAdminPage() {
   ];
 
   useEffect(() => {
-    const saved = localStorage.getItem("startseiteData");
+    const loadData = async () => {
+      const { data, error } = await supabase
+        .from("startseite")
+        .select("*")
+        .eq("id", 1)
+        .single();
 
-    if (saved) {
-      const data = JSON.parse(saved);
+      if (error) {
+        console.error(error);
+        return;
+      }
 
-      setHeadline(data.headline || "Neueröffnung am");
-      setHeadlineFont(data.headlineFont || fredoka.className);
-      setHeadlineSize(data.headlineSize || "text-6xl");
+      if (data) {
+        setHeadline(data.headline || "Neueröffnung am");
+        setHeadlineFont(data.headline_font || fredoka.className);
+        setHeadlineSize(data.headline_size || "text-6xl");
 
-      setDate(data.date || "15.11.2025!");
-      setDateFont(data.dateFont || fredoka.className);
-      setDateSize(data.dateSize || "text-5xl");
+        setDate(data.date || "15.11.2025!");
+        setDateFont(data.date_font || fredoka.className);
+        setDateSize(data.date_size || "text-5xl");
 
-      setAddress(
-        data.address ||
-          "Besucht uns auf der Blumenstraße 7, 69168 Wiesloch Baden-Württemberg."
-      );
-      setAddressFont(data.addressFont || "font-sans");
-      setAddressSize(data.addressSize || "text-3xl");
+        setAddress(
+          data.address ||
+            "Besucht uns auf der Blumenstraße 7, 69168 Wiesloch Baden-Württemberg."
+        );
+        setAddressFont(data.address_font || "font-sans");
+        setAddressSize(data.address_size || "text-3xl");
 
-      setDescription(
-        data.description ||
-          "Willkommen bei SAMISON'S WONDERLAND – eure magische Spielzeugwelt voller Abenteuer, Farben und Spaß!"
-      );
-      setDescriptionFont(data.descriptionFont || "font-sans");
-      setDescriptionSize(data.descriptionSize || "text-xl");
+        setDescription(
+          data.description ||
+            "Willkommen bei SAMISON'S WONDERLAND – eure magische Spielzeugwelt voller Abenteuer, Farben und Spaß!"
+        );
+        setDescriptionFont(data.description_font || "font-sans");
+        setDescriptionSize(data.description_size || "text-xl");
 
-      setImage(data.image || null);
-    }
-  }, []);
-
-  const handleSave = () => {
-    const data = {
-      headline,
-      headlineFont,
-      headlineSize,
-
-      date,
-      dateFont,
-      dateSize,
-
-      address,
-      addressFont,
-      addressSize,
-
-      description,
-      descriptionFont,
-      descriptionSize,
-
-      image,
+        setImage(data.image || null);
+      }
     };
 
-    localStorage.setItem("startseiteData", JSON.stringify(data));
+    loadData();
+  }, []);
+
+  const handleSave = async () => {
+    const { error } = await supabase
+      .from("startseite")
+      .upsert([
+        {
+          id: 1,
+          headline,
+          headline_font: headlineFont,
+          headline_size: headlineSize,
+          date,
+          date_font: dateFont,
+          date_size: dateSize,
+          address,
+          address_font: addressFont,
+          address_size: addressSize,
+          description,
+          description_font: descriptionFont,
+          description_size: descriptionSize,
+          image,
+        },
+      ]);
+
+    if (error) {
+      console.error(error);
+      alert("Fehler beim Speichern");
+      return;
+    }
+
     alert("Startseite gespeichert!");
   };
 
@@ -109,13 +126,13 @@ export default function StartseiteAdminPage() {
     <main className="min-h-screen bg-[#eef5ff]">
       <Navbar />
 
-      <div className="max-w-7xl mx-auto px-8 py-10">
-        <h1 className="text-5xl font-bold text-green-500 mb-8">
+      <div className="mx-auto max-w-7xl px-8 py-10">
+        <h1 className="mb-8 text-5xl font-bold text-green-500">
           Startseite bearbeiten
         </h1>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <div className="rounded-3xl bg-white p-8 shadow-lg flex flex-col gap-5">
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
+          <div className="flex flex-col gap-5 rounded-3xl bg-white p-8 shadow-lg">
             <input
               type="text"
               value={headline}
@@ -184,7 +201,7 @@ export default function StartseiteAdminPage() {
               value={address}
               onChange={(e) => setAddress(e.target.value)}
               placeholder="Adresse"
-              className="rounded-2xl border border-slate-200 p-4 h-28"
+              className="h-28 rounded-2xl border border-slate-200 p-4"
             />
 
             <select
@@ -215,7 +232,7 @@ export default function StartseiteAdminPage() {
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Beschreibung"
-              className="rounded-2xl border border-slate-200 p-4 h-36"
+              className="h-36 rounded-2xl border border-slate-200 p-4"
             />
 
             <select
@@ -250,9 +267,11 @@ export default function StartseiteAdminPage() {
                 if (!file) return;
 
                 const reader = new FileReader();
+
                 reader.onloadend = () => {
                   setImage(reader.result as string);
                 };
+
                 reader.readAsDataURL(file);
               }}
               className="rounded-2xl border border-slate-200 p-4"
@@ -260,41 +279,41 @@ export default function StartseiteAdminPage() {
 
             <button
               onClick={handleSave}
-              className="mt-2 rounded-2xl bg-green-500 hover:bg-green-600 text-white font-bold py-4 px-6 transition"
+              className="mt-2 rounded-2xl bg-green-500 px-6 py-4 font-bold text-white transition hover:bg-green-600"
             >
               Speichern
             </button>
           </div>
 
-          <div className="rounded-3xl bg-white p-10 shadow-lg flex flex-col items-center text-center">
+          <div className="flex flex-col items-center rounded-3xl bg-white p-10 text-center shadow-lg">
             {image && (
               <img
                 src={image}
                 alt="Startseite"
-                className="w-full h-[250px] object-cover rounded-3xl mb-8"
+                className="mb-8 h-[250px] w-full rounded-3xl object-cover"
               />
             )}
 
             <h2
-              className={`${headlineSize} font-extrabold text-blue-500 mb-3 ${headlineFont}`}
+              className={`${headlineSize} mb-3 font-extrabold text-blue-500 ${headlineFont}`}
             >
               {headline}
             </h2>
 
             <h3
-              className={`${dateSize} font-extrabold text-pink-500 mb-8 ${dateFont}`}
+              className={`${dateSize} mb-8 font-extrabold text-pink-500 ${dateFont}`}
             >
               {date}
             </h3>
 
             <p
-              className={`${addressSize} font-bold text-slate-700 mb-8 ${addressFont}`}
+              className={`${addressSize} mb-8 font-bold text-slate-700 ${addressFont}`}
             >
               {address}
             </p>
 
             <p
-              className={`${descriptionSize} text-slate-600 max-w-2xl leading-8 ${descriptionFont}`}
+              className={`${descriptionSize} max-w-2xl leading-8 text-slate-600 ${descriptionFont}`}
             >
               {description}
             </p>

@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { supabase } from "@/app/lib/supabase";
 
 export default function Navbar() {
   const isAdmin =

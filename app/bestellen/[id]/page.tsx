@@ -4,15 +4,6 @@ import { useParams, useRouter } from "next/navigation";
 import { useState } from "react";
 import { supabase } from "@/app/lib/supabase";
 
-type Order = {
-  id: number;
-  customer: string;
-  email: string;
-  product: string;
-  date: string;
-  revenue: string;
-};
-
 type SavedProduct = {
   id: number;
   name: string;
@@ -25,37 +16,49 @@ export default function BestellungPage() {
 
   const id = Number(params.id);
 
-  const [name, setName] = useState<string>("");
-  const [email, setEmail] = useState<string>("");
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
 
-  const handleWeiter = () => {
-    const savedProducts = localStorage.getItem("products");
-    const products: SavedProduct[] = savedProducts
-      ? JSON.parse(savedProducts)
-      : [];
+  const handleWeiter = async () => {
+    if (!name || !email) {
+      alert("Bitte Name und E-Mail eingeben.");
+      return;
+    }
 
-    const selectedProduct = products.find(
+    const { data: products, error: productError } = await supabase
+      .from("spielzeuge")
+      .select("id, name, price");
+
+    if (productError) {
+      console.error(productError);
+      alert("Produkte konnten nicht geladen werden.");
+      return;
+    }
+
+    const selectedProduct = (products as SavedProduct[])?.find(
       (product) => product.id === id
     );
 
-    const order: Order = {
-      id: Date.now(),
-      customer: name,
-      email: email,
-      product: selectedProduct?.name || `Produkt ${id}`,
-      date: new Date().toLocaleDateString("de-DE"),
-      revenue: selectedProduct?.price || "0,00 €",
-    };
+    const { error: orderError } = await supabase
+      .from("orders")
+      .insert([
+        {
+          id: Date.now(),
+          customer: name,
+          email,
+          product: selectedProduct?.name || `Produkt ${id}`,
+          date: new Date().toLocaleDateString("de-DE"),
+          revenue: selectedProduct?.price || "0,00 €",
+        },
+      ]);
 
-    const existingOrders: Order[] = JSON.parse(
-      localStorage.getItem("orders") || "[]"
-    );
+    if (orderError) {
+      console.error(orderError);
+      alert("Bestellung konnte nicht gespeichert werden.");
+      return;
+    }
 
-    existingOrders.push(order);
-
-    localStorage.setItem("orders", JSON.stringify(existingOrders));
-
-    localStorage.setItem(
+    sessionStorage.setItem(
       "bestellung",
       JSON.stringify({
         productId: id,
@@ -68,7 +71,7 @@ export default function BestellungPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#eef5ff] p-8">
+    <div className="flex min-h-screen items-center justify-center bg-[#eef5ff] p-8">
       <div className="w-full max-w-md rounded-3xl bg-white p-8 shadow-lg">
         <h1 className="mb-4 text-3xl font-bold text-pink-500">
           Bestellung für Produkt {id}

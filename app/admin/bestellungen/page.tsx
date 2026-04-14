@@ -17,29 +17,55 @@ export default function BestellungenAdminPage() {
   const [orders, setOrders] = useState<Order[]>([]);
 
   useEffect(() => {
-    const savedOrders = localStorage.getItem("orders");
+    const loadOrders = async () => {
+      const { data, error } = await supabase
+        .from("orders")
+        .select("*")
+        .order("id", { ascending: false });
 
-    if (savedOrders) {
-      setOrders(JSON.parse(savedOrders));
-    }
+      if (error) {
+        console.error("Fehler beim Laden:", error);
+        return;
+      }
+
+      setOrders(data || []);
+    };
+
+    loadOrders();
   }, []);
 
-  const deleteOrder = (id: number) => {
-    const updatedOrders = orders.filter((order) => order.id !== id);
+  const deleteOrder = async (id: number) => {
+    const { error } = await supabase
+      .from("orders")
+      .delete()
+      .eq("id", id);
 
-    setOrders(updatedOrders);
-    localStorage.setItem("orders", JSON.stringify(updatedOrders));
+    if (error) {
+      console.error("Fehler beim Löschen:", error);
+      return;
+    }
+
+    setOrders((prev) => prev.filter((order) => order.id !== id));
   };
 
-  const deleteAllOrders = () => {
+  const deleteAllOrders = async () => {
     const confirmed = window.confirm(
       "Möchtest du wirklich alle Bestellungen löschen?"
     );
 
-    if (confirmed) {
-      setOrders([]);
-      localStorage.removeItem("orders");
+    if (!confirmed) return;
+
+    const { error } = await supabase
+      .from("orders")
+      .delete()
+      .gt("id", 0);
+
+    if (error) {
+      console.error("Fehler beim Löschen aller Bestellungen:", error);
+      return;
     }
+
+    setOrders([]);
   };
 
   const totalMonthlyRevenue = orders.reduce((sum, order) => {

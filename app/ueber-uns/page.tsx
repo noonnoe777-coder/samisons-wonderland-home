@@ -23,31 +23,40 @@ export default function UeberUnsPage() {
   const [descriptionFont, setDescriptionFont] = useState("font-sans");
   const [descriptionSize, setDescriptionSize] = useState("text-xl");
 
-  const [image, setImage] = useState<string | null>("/ueber-uns/shop.jpg");
-  const [video, setVideo] = useState<string | null>(
-    "/ueber-uns/shop-video.mp4"
-  );
+  const [image, setImage] = useState<string | null>(null);
+  const [video, setVideo] = useState<string | null>(null);
 
   useEffect(() => {
-    const savedData = localStorage.getItem("ueberUns");
+    const loadUeberUns = async () => {
+      const { data, error } = await supabase
+        .from("ueber_uns")
+        .select("*")
+        .eq("id", 1)
+        .single();
 
-    if (!savedData) return;
+      if (error) {
+        console.error(error);
+        return;
+      }
 
-    const data = JSON.parse(savedData);
+      if (!data) return;
 
-    setTitle(data.title || "Willkommen bei SAMISON'S WONDERLAND");
-    setTitleFont(data.titleFont || fredoka.className);
-    setTitleSize(data.titleSize || "text-4xl");
+      setTitle(data.title || "Willkommen bei SAMISON'S WONDERLAND");
+      setTitleFont(data.title_font || fredoka.className);
+      setTitleSize(data.title_size || "text-4xl");
 
-    setDescription(
-      data.description ||
-        "Hier findest du liebevoll ausgewähltes Spielzeug und wunderschöne Schreibwaren für Kinder. Unser Ziel ist es, Kindern Freude zu schenken und Eltern hochwertige Produkte anzubieten."
-    );
-    setDescriptionFont(data.descriptionFont || "font-sans");
-    setDescriptionSize(data.descriptionSize || "text-xl");
+      setDescription(
+        data.description ||
+          "Hier findest du liebevoll ausgewähltes Spielzeug und wunderschöne Schreibwaren für Kinder. Unser Ziel ist es, Kindern Freude zu schenken und Eltern hochwertige Produkte anzubieten."
+      );
+      setDescriptionFont(data.description_font || "font-sans");
+      setDescriptionSize(data.description_size || "text-xl");
 
-    setImage(data.image || "/ueber-uns/shop.jpg");
-    setVideo(data.video || "/ueber-uns/shop-video.mp4");
+      setImage(data.image || null);
+      setVideo(data.video || null);
+    };
+
+    loadUeberUns();
   }, []);
 
   return (
@@ -68,7 +77,12 @@ export default function UeberUnsPage() {
             />
           )}
 
-          
+          {video && (
+            <video controls className="mb-8 w-full rounded-3xl">
+              <source src={video} />
+            </video>
+          )}
+
           <h2
             className={`mb-5 font-extrabold text-blue-500 ${titleFont} ${titleSize}`}
           >

@@ -22,7 +22,6 @@ export async function POST(req: Request) {
     const session = await stripe.checkout.sessions.create({
       mode: "payment",
 
-      // Aktivierte Zahlungsmethoden
       payment_method_types: ["card", "klarna", "paypal"],
 
       customer_email: email,
@@ -46,7 +45,7 @@ export async function POST(req: Request) {
             product_data: {
               name: `Produkt ${id}`,
             },
-            unit_amount: 2500, // 25,00 €
+            unit_amount: 2500,
           },
           quantity: 1,
         },
@@ -54,12 +53,30 @@ export async function POST(req: Request) {
 
       metadata: {
         customer_name: name,
+        customer_email: email,
         product_id: String(id),
       },
 
       success_url: `${process.env.NEXT_PUBLIC_URL}/danke?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${process.env.NEXT_PUBLIC_URL}/payment/${id}`,
     });
+
+    const { error: orderError } = await supabase
+      .from("orders")
+      .insert([
+        {
+          id: Date.now(),
+          customer: name,
+          email,
+          product: `Produkt ${id}`,
+          date: new Date().toLocaleDateString("de-DE"),
+          revenue: "25,00 €",
+        },
+      ]);
+
+    if (orderError) {
+      console.error("Supabase Fehler:", orderError);
+    }
 
     if (!session.url) {
       return NextResponse.json(

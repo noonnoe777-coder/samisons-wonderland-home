@@ -9,53 +9,34 @@ export default function TrackingPage() {
   const [searched, setSearched] = useState(false);
 
   const [tracking, setTracking] = useState<null | {
-    order: string;
+    order_number: string;
     product: string;
     status: string;
-    arrival: string;
+    estimated_date: string;
   }>(null);
 
-  const orders = [
-    {
-      order: "SW-1001",
-      product: "Motorik-Würfel",
-      status: "Unterwegs",
-      arrival: "08.04.2026",
-    },
-    {
-      order: "SW-1002",
-      product: "Buntstifte Set",
-      status: "Verschickt",
-      arrival: "09.04.2026",
-    },
-    {
-      order: "SW-1003",
-      product: "Holzeisenbahn",
-      status: "Zugestellt",
-      arrival: "05.04.2026",
-    },
-  ];
-
-  const searchOrder = () => {
+  const searchOrder = async () => {
     setSearched(true);
 
-    const found = orders.find(
-      (item) =>
-        item.order.toLowerCase() === orderNumber.trim().toLowerCase()
-    );
+    const { data, error } = await supabase
+      .from("tracking")
+      .select("*")
+      .eq("order_number", orderNumber.trim())
+      .single();
 
-    if (found) {
-      setTracking(found);
-    } else {
+    if (error || !data) {
       setTracking(null);
+      return;
     }
+
+    setTracking(data);
   };
 
   return (
     <main className="min-h-screen bg-[#eef5ff]">
       <Navbar />
 
-      <div className="max-w-5xl mx-auto px-6 py-14">
+      <div className="mx-auto max-w-5xl px-6 py-14">
         <h1 className="mb-10 text-5xl font-bold text-yellow-500">
           Bestellung verfolgen
         </h1>
@@ -96,7 +77,7 @@ export default function TrackingPage() {
               <div className="space-y-4 text-lg text-slate-700">
                 <p>
                   <span className="font-bold">Bestellnummer:</span>{" "}
-                  {tracking.order}
+                  {tracking.order_number}
                 </p>
 
                 <p>
@@ -108,7 +89,7 @@ export default function TrackingPage() {
                   <span className="font-bold">Status:</span>{" "}
                   <span
                     className={`font-bold ${
-                      tracking.status === "Zugestellt"
+                      tracking.status === "Erledigt"
                         ? "text-green-600"
                         : tracking.status === "Unterwegs"
                         ? "text-yellow-600"
@@ -123,7 +104,7 @@ export default function TrackingPage() {
                   <span className="font-bold">
                     Voraussichtliche Lieferung:
                   </span>{" "}
-                  {tracking.arrival}
+                  {tracking.estimated_date}
                 </p>
               </div>
             </div>
