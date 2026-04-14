@@ -21,9 +21,8 @@ export async function POST(req: Request) {
     const session = await stripe.checkout.sessions.create({
       mode: "payment",
 
-      // Test zuerst nur mit Karte.
-      // Wenn das funktioniert, kannst du später "paypal", "klarna" und "sepa_debit" wieder hinzufügen.
-      payment_method_types: ["card"],
+      // Aktivierte Zahlungsmethoden
+      payment_method_types: ["card", "klarna"],
 
       customer_email: email,
       customer_creation: "always",
