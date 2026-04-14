@@ -22,7 +22,7 @@ export async function POST(req: Request) {
       mode: "payment",
 
       // Aktivierte Zahlungsmethoden
-      payment_method_types: ["card", "klarna"],
+      payment_method_types: ["card", "klarna", "paypal"],
 
       customer_email: email,
       customer_creation: "always",
