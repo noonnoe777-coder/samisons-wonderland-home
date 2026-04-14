@@ -5,6 +5,7 @@ import { Fredoka } from "next/font/google";
 import Navbar from "@/Components/Navbar";
 import Image from "next/image";
 import Link from "next/link";
+import { supabase } from "@/app/lib/supabase";
 
 const fredoka = Fredoka({
   subsets: ["latin"],
@@ -12,62 +13,77 @@ const fredoka = Fredoka({
 });
 
 type StartseiteData = {
+  id: number;
   headline?: string;
-  headlineFont?: string;
+  headline_font?: string;
   date?: string;
-  dateFont?: string;
+  date_font?: string;
   address?: string;
-  addressFont?: string;
+  address_font?: string;
   description?: string;
-  descriptionFont?: string;
+  description_font?: string;
   image?: string | null;
+  kitten_image?: string | null;
 };
 
+const DEFAULT_HEADLINE = "Neueröffnung am";
+const DEFAULT_DATE = "15.11.2025!";
+const DEFAULT_ADDRESS =
+  "Besucht uns auf der Blumenstraße 7, 69168 Wiesloch Baden-Württemberg.";
+const DEFAULT_DESCRIPTION =
+  "SAMISON'S WONDERLAND ist der Ort, an dem Kinder lachen und spielen, während Eltern entspannt einkaufen.";
+const DEFAULT_KITTEN_IMAGE = "/kitten heart yarn.png";
+
 export default function Page() {
-  const [headline, setHeadline] = useState("Neueröffnung am");
-  const [headlineFont, setHeadlineFont] = useState(fredoka.className);
+  const [headline, setHeadline] = useState<string>(DEFAULT_HEADLINE);
+  const [headlineFont, setHeadlineFont] = useState<string>(fredoka.className);
 
-  const [date, setDate] = useState("15.11.2025!");
-  const [dateFont, setDateFont] = useState(fredoka.className);
+  const [date, setDate] = useState<string>(DEFAULT_DATE);
+  const [dateFont, setDateFont] = useState<string>(fredoka.className);
 
-  const [address, setAddress] = useState(
-    "Besucht uns auf der Blumenstraße 7, 69168 Wiesloch Baden-Württemberg."
-  );
-  const [addressFont, setAddressFont] = useState("font-sans");
+  const [address, setAddress] = useState<string>(DEFAULT_ADDRESS);
+  const [addressFont, setAddressFont] = useState<string>("font-sans");
 
-  const [description, setDescription] = useState(
-    "SAMISON'S WONDERLAND ist der Ort, an dem Kinder lachen und spielen, während Eltern entspannt einkaufen."
-  );
-  const [descriptionFont, setDescriptionFont] = useState("font-sans");
+  const [description, setDescription] = useState<string>(DEFAULT_DESCRIPTION);
+  const [descriptionFont, setDescriptionFont] = useState<string>("font-sans");
 
   const [heroImage, setHeroImage] = useState<string | null>(null);
+  const [kittenImage, setKittenImage] = useState<string>(DEFAULT_KITTEN_IMAGE);
 
   useEffect(() => {
-    const saved = localStorage.getItem("startseiteData");
+    async function loadHomepage() {
+      const { data, error } = await supabase
+        .from("startseite")
+        .select("*")
+        .eq("id", 1)
+        .single();
 
-    if (saved) {
-      const data: StartseiteData = JSON.parse(saved);
+      if (error) {
+        console.error("Fehler beim Laden der Startseite:", error);
+        return;
+      }
 
-      setHeadline(data.headline ?? "Neueröffnung am");
-      setHeadlineFont(data.headlineFont ?? fredoka.className);
+      const homepage = data as StartseiteData | null;
 
-      setDate(data.date ?? "15.11.2025!");
-      setDateFont(data.dateFont ?? fredoka.className);
+      if (!homepage) return;
 
-      setAddress(
-        data.address ??
-          "Besucht uns auf der Blumenstraße 7, 69168 Wiesloch Baden-Württemberg."
-      );
-      setAddressFont(data.addressFont ?? "font-sans");
+      setHeadline(homepage.headline ?? DEFAULT_HEADLINE);
+      setHeadlineFont(homepage.headline_font ?? fredoka.className);
 
-      setDescription(
-        data.description ??
-          "SAMISON'S WONDERLAND ist der Ort, an dem Kinder lachen und spielen, während Eltern entspannt einkaufen."
-      );
-      setDescriptionFont(data.descriptionFont ?? "font-sans");
+      setDate(homepage.date ?? DEFAULT_DATE);
+      setDateFont(homepage.date_font ?? fredoka.className);
 
-      setHeroImage(data.image ?? null);
+      setAddress(homepage.address ?? DEFAULT_ADDRESS);
+      setAddressFont(homepage.address_font ?? "font-sans");
+
+      setDescription(homepage.description ?? DEFAULT_DESCRIPTION);
+      setDescriptionFont(homepage.description_font ?? "font-sans");
+
+      setHeroImage(homepage.image ?? null);
+      setKittenImage(homepage.kitten_image ?? DEFAULT_KITTEN_IMAGE);
     }
+
+    loadHomepage();
   }, []);
 
   return (
@@ -90,34 +106,37 @@ export default function Page() {
 
         <div className="flex flex-col items-center px-4 pt-24 text-center md:px-6 md:pt-32">
           {heroImage && (
-            <img
+            <Image
               src={heroImage}
               alt="Startseite"
+              width={1400}
+              height={700}
+              priority
               className="mb-8 h-auto max-h-[320px] w-full max-w-4xl rounded-3xl object-cover shadow-2xl"
             />
           )}
 
           <h1
-            className={`text-3xl sm:text-4xl md:text-6xl font-extrabold text-blue-500 ${headlineFont}`}
+            className={`text-3xl font-extrabold text-blue-500 sm:text-4xl md:text-6xl ${headlineFont}`}
           >
             {headline}
           </h1>
 
           <p
-            className={`mt-2 text-2xl sm:text-3xl md:text-5xl font-extrabold text-pink-500 ${dateFont}`}
+            className={`mt-2 text-2xl font-extrabold text-pink-500 sm:text-3xl md:text-5xl ${dateFont}`}
           >
             {date}
           </p>
 
           <p
-            className={`mt-6 max-w-4xl text-lg sm:text-xl md:text-3xl font-semibold text-slate-700 ${addressFont}`}
+            className={`mt-6 max-w-4xl text-lg font-semibold text-slate-700 sm:text-xl md:text-3xl ${addressFont}`}
           >
             {address}
           </p>
 
           <Link
             href="/jetzt-mehr-erfahren"
-            className="mt-8 rounded-full bg-yellow-400 px-6 py-3 text-lg sm:px-10 sm:py-4 sm:text-2xl font-bold text-white shadow-lg transition hover:scale-105 hover:bg-yellow-500"
+            className="mt-8 rounded-full bg-yellow-400 px-6 py-3 text-lg font-bold text-white shadow-lg transition hover:scale-105 hover:bg-yellow-500 sm:px-10 sm:py-4 sm:text-2xl"
           >
             Jetzt mehr erfahren
           </Link>
@@ -125,15 +144,14 @@ export default function Page() {
 
         <div className="relative mt-10 flex flex-col items-center gap-10 px-4 pb-12 md:flex-row md:items-start md:justify-between md:px-10">
           <div className="max-w-3xl text-center md:text-left">
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold leading-tight text-slate-700">
-              Willkommen bei{" "}
-              <span className="text-pink-500">SAMISON&apos;s</span>
+            <h2 className="text-3xl font-extrabold leading-tight text-slate-700 sm:text-4xl md:text-5xl">
+              Willkommen bei <span className="text-pink-500">SAMISON&apos;s</span>
               <br />
               <span className="text-blue-500">WONDERLAND!</span>
             </h2>
 
             <p
-              className={`mt-6 leading-relaxed text-slate-700 ${descriptionFont} text-base sm:text-lg md:text-2xl`}
+              className={`mt-6 text-base leading-relaxed text-slate-700 sm:text-lg md:text-2xl ${descriptionFont}`}
             >
               {description}
             </p>
@@ -157,19 +175,11 @@ export default function Page() {
             />
 
             <Image
-              src="/Teddy bear with red heart.png"
-              alt="Teddy mit Herz"
-              width={240}
-              height={240}
-              className="absolute left-[40px] top-[80px] z-20 w-[90px] sm:left-[80px] sm:w-[130px] md:left-[180px] md:top-[120px] md:w-[220px]"
-            />
-
-            <Image
-              src="/Cute rubber duck logo in pastel tones.png"
-              alt="Ente"
-              width={120}
-              height={120}
-              className="absolute right-[20px] top-[120px] z-30 w-[50px] sm:right-[40px] sm:w-[70px] md:right-[120px] md:top-[230px] md:w-[110px]"
+              src={kittenImage}
+              alt="Kitten with heart yarn"
+              width={260}
+              height={260}
+              className="absolute bottom-0 right-[55px] z-20 w-[95px] sm:w-[130px] md:bottom-[10px] md:right-[120px] md:w-[180px]"
             />
           </div>
         </div>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { supabase } from "@/app/lib/supabase";
 
 export default function DankePage() {
   const [hearts, setHearts] = useState<number[]>([]);

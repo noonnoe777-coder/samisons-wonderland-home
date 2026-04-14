@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Navbar from "@/Components/Navbar";
+import { supabase } from "@/app/lib/supabase";
 
 export default function TrackingPage() {
   const [orderNumber, setOrderNumber] = useState("");

@@ -2,6 +2,7 @@
 
 import { useParams, useRouter } from "next/navigation";
 import { useState } from "react";
+import { supabase } from "@/app/lib/supabase";
 
 type Order = {
   id: number;

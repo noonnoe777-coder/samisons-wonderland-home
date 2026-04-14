@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import { supabase } from "@/app/lib/supabase";
 
 const nextConfig: NextConfig = {
   async headers() {

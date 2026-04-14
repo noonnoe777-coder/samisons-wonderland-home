@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { Fredoka, Nunito } from "next/font/google";
+import { supabase } from "@/app/lib/supabase";
 
 const fredoka = Fredoka({
   subsets: ["latin"],

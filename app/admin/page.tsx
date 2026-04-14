@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Navbar from "@/Components/Navbar";
+import { supabase } from "@/app/lib/supabase";
 
 export default function AdminPage() {
   return (

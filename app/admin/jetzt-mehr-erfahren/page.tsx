@@ -3,6 +3,7 @@
 import { useEffect, useState, ChangeEvent } from "react";
 import { Fredoka } from "next/font/google";
 import Navbar from "@/Components/Navbar";
+import { supabase } from "@/app/lib/supabase";
 
 const fredoka = Fredoka({
   subsets: ["latin"],

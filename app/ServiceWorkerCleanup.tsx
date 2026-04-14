@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import { supabase } from "@/app/lib/supabase";
 
 export default function ServiceWorkerCleanup() {
   useEffect(() => {

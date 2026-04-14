@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Navbar from "@/Components/Navbar";
+import { supabase } from "@/app/lib/supabase";
 
 type Order = {
   id: number;

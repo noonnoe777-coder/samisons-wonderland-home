@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { supabase } from "@/app/lib/supabase";
 
 export default function AdminBewertungenPage() {
   const [bewertungen, setBewertungen] = useState<any[]>([]);

@@ -2,6 +2,7 @@
 
 import { JSX, useEffect, useState } from "react";
 import { Fredoka } from "next/font/google";
+import { supabase } from "@/app/lib/supabase";
 
 const fredoka = Fredoka({
   subsets: ["latin"],

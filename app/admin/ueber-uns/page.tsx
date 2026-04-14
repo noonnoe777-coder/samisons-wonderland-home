@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Fredoka } from "next/font/google";
 import Navbar from "@/Components/Navbar";
+import { supabase } from "@/app/lib/supabase";
 
 const fredoka = Fredoka({
   subsets: ["latin"],
