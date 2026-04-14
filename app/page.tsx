@@ -177,10 +177,10 @@ export default function Page() {
             <Image
               src={kittenImage}
               alt="Kitten with heart yarn"
-              width={260}
-              height={260}
-              className="absolute bottom-0 right-[55px] z-20 w-[95px] sm:w-[130px] md:bottom-[10px] md:right-[120px] md:w-[180px]"
-            />
+              width={280}
+              height={280}
+               className="absolute bottom-[40px] right-[140px] z-20 w-[95px] sm:right-[180px] sm:w-[130px] md:bottom-[20px] md:right-[260px] md:w-[180px]"
+/>
           </div>
         </div>
       </div>
