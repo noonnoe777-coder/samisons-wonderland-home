@@ -46,7 +46,7 @@ export default function Navbar() {
         </h1>
       </div>
 
-      <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4 md:gap-5 text-sm sm:text-base md:text-lg font-bold text-slate-700 font-[var(--font-nunito)]">
+      <div className="flex flex-wrap items-center justify-center md:justify-end gap-3 sm:gap-4 md:gap-5 text-sm sm:text-base md:text-lg font-bold text-slate-700 font-[var(--font-nunito)] max-w-[1100px]">
         <Link
           href="/"
           className="transition hover:text-pink-500"
@@ -112,7 +112,7 @@ export default function Navbar() {
 
         <Link
           href="/registrieren"
-          className="rounded-full bg-pink-500 px-4 py-2 text-white shadow-md transition hover:bg-pink-600"
+          className="whitespace-nowrap rounded-full bg-pink-500 px-4 py-2 text-white shadow-md transition hover:bg-pink-600"
         >
           Registrieren
         </Link>
