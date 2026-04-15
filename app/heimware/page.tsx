@@ -77,6 +77,40 @@ export default function HeimwarePage() {
     );
   }, [products, search]);
 
+  const toggleFavorite = (product: Product) => {
+    const savedProduct = {
+      id: product.id,
+      name: product.name,
+      price: product.price,
+      images: product.images,
+    };
+
+    const current = JSON.parse(
+      localStorage.getItem("favorites") || "[]"
+    );
+
+    const exists = current.some(
+      (item: { id: number }) => item.id === product.id
+    );
+
+    let updated;
+
+    if (exists) {
+      updated = current.filter(
+        (item: { id: number }) => item.id !== product.id
+      );
+    } else {
+      updated = [...current, savedProduct];
+    }
+
+    localStorage.setItem("favorites", JSON.stringify(updated));
+
+    setFavorites((prev) => ({
+      ...prev,
+      [product.id]: !prev[product.id],
+    }));
+  };
+
   return (
     <main className="min-h-screen bg-[#eef5ff]">
       <Navbar />
@@ -120,44 +154,7 @@ export default function HeimwarePage() {
                     />
 
                     <button
-                      onClick={() => {
-                        const savedProduct = {
-                          id: product.id,
-                          name: product.name,
-                          price: product.price,
-                          images: product.images,
-                        };
-
-                        const current = JSON.parse(
-                          localStorage.getItem("favorites") || "[]"
-                        );
-
-                        const exists = current.some(
-                          (item: { id: number }) =>
-                            item.id === product.id
-                        );
-
-                        let updated;
-
-                        if (exists) {
-                          updated = current.filter(
-                            (item: { id: number }) =>
-                              item.id !== product.id
-                          );
-                        } else {
-                          updated = [...current, savedProduct];
-                        }
-
-                        localStorage.setItem(
-                          "favorites",
-                          JSON.stringify(updated)
-                        );
-
-                        setFavorites((prev) => ({
-                          ...prev,
-                          [product.id]: !prev[product.id],
-                        }));
-                      }}
+                      onClick={() => toggleFavorite(product)}
                       className="absolute left-3 top-3 flex h-11 w-11 items-center justify-center rounded-full bg-white/90 text-2xl shadow-lg transition hover:scale-110"
                     >
                       {favorites[product.id] ? "❤️" : "🤍"}
@@ -242,7 +239,7 @@ export default function HeimwarePage() {
                       className="min-h-[70px] w-full rounded-xl border-2 border-pink-200 bg-pink-50 px-3 py-2 text-[11px] text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-pink-400 focus:bg-white sm:min-h-[90px] sm:text-sm"
                     />
 
-                    <div className="flex items-center gap-2">
+                    <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
                       <div className="flex items-center rounded-xl border border-pink-200 bg-pink-50 px-1 py-1">
                         <button
                           onClick={() => {
@@ -286,51 +283,14 @@ export default function HeimwarePage() {
                         }&gravur=${
                           engraving[product.id] || false
                         }`}
-                        className="flex-1 rounded-xl bg-pink-500 px-3 py-2 text-center text-[11px] font-bold text-white transition hover:bg-pink-600 sm:text-sm"
+                        className="w-full sm:flex-1 rounded-xl bg-pink-500 px-3 py-2 text-center text-[11px] font-bold text-white transition hover:bg-pink-600 sm:text-sm"
                       >
                         Bestellen
                       </Link>
                     </div>
 
                     <button
-                      onClick={() => {
-                        const savedProduct = {
-                          id: product.id,
-                          name: product.name,
-                          price: product.price,
-                          images: product.images,
-                        };
-
-                        const current = JSON.parse(
-                          localStorage.getItem("favorites") || "[]"
-                        );
-
-                        const exists = current.some(
-                          (item: { id: number }) =>
-                            item.id === product.id
-                        );
-
-                        let updated;
-
-                        if (exists) {
-                          updated = current.filter(
-                            (item: { id: number }) =>
-                              item.id !== product.id
-                          );
-                        } else {
-                          updated = [...current, savedProduct];
-                        }
-
-                        localStorage.setItem(
-                          "favorites",
-                          JSON.stringify(updated)
-                        );
-
-                        setFavorites((prev) => ({
-                          ...prev,
-                          [product.id]: !prev[product.id],
-                        }));
-                      }}
+                      onClick={() => toggleFavorite(product)}
                       className="flex w-full items-center justify-center gap-2 rounded-xl border-2 border-pink-200 px-3 py-2 text-[11px] font-bold text-pink-500 transition hover:bg-pink-50 sm:text-sm"
                     >
                       <span className="text-lg">
@@ -369,6 +329,149 @@ export default function HeimwarePage() {
                 </div>
               </div>
             ))}
+          </div>
+        )}
+
+        {selectedDescription && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+            <div className="relative w-full max-w-lg rounded-[32px] bg-white p-6 shadow-2xl">
+              <button
+                onClick={() => setSelectedDescription(null)}
+                className="absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-full bg-pink-100 text-xl font-bold text-pink-500"
+              >
+                ×
+              </button>
+
+              <h2 className="mb-5 pr-12 text-2xl font-bold text-pink-500">
+                {selectedDescription.name}
+              </h2>
+
+              {selectedDescription.images?.[0] && (
+                <img
+                  src={selectedDescription.images[0]}
+                  alt={selectedDescription.name}
+                  className="mb-5 h-72 w-full rounded-3xl object-cover"
+                />
+              )}
+
+              <p className="mb-3 text-2xl font-bold text-yellow-500">
+                {selectedDescription.price}
+              </p>
+
+              <div className="mb-4 rounded-2xl border border-slate-200 bg-slate-50 p-3 text-sm text-slate-700">
+                <p className="mb-1">
+                  📦 {selectedDescription.deliveryText}
+                </p>
+
+                {selectedDescription.noReturn && (
+                  <p>⚠️ Keine Rückannahme möglich</p>
+                )}
+              </div>
+
+              <p className="text-sm leading-7 text-slate-600">
+                {selectedDescription.description}
+              </p>
+            </div>
+          </div>
+        )}
+
+        {selectedImageProduct && (
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4"
+            onClick={() => setSelectedImageProduct(null)}
+          >
+            <div
+              className="relative w-full max-w-6xl rounded-[32px] bg-white p-5 shadow-2xl"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <button
+                onClick={() => setSelectedImageProduct(null)}
+                className="absolute right-4 top-4 z-20 flex h-10 w-10 items-center justify-center rounded-full bg-blue-100 text-xl font-bold text-blue-500"
+              >
+                ×
+              </button>
+
+              <div className="flex items-center justify-center">
+                <img
+                  src={selectedImageProduct.images[currentImageIndex]}
+                  alt={selectedImageProduct.name}
+                  className="max-h-[80vh] w-full rounded-3xl object-contain bg-white"
+                />
+              </div>
+
+              {selectedImageProduct.images.length > 1 && (
+                <>
+                  <button
+                    onClick={() =>
+                      setCurrentImageIndex((prev) =>
+                        prev === 0
+                          ? selectedImageProduct.images.length - 1
+                          : prev - 1
+                      )
+                    }
+                    className="absolute left-4 top-1/2 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-2xl shadow-lg"
+                  >
+                    ←
+                  </button>
+
+                  <button
+                    onClick={() =>
+                      setCurrentImageIndex((prev) =>
+                        prev === selectedImageProduct.images.length - 1
+                          ? 0
+                          : prev + 1
+                      )
+                    }
+                    className="absolute right-4 top-1/2 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-2xl shadow-lg"
+                  >
+                    →
+                  </button>
+
+                  <div className="mt-4 flex flex-wrap justify-center gap-3">
+                    {selectedImageProduct.images.map((image, index) => (
+                      <button
+                        key={index}
+                        onClick={() => setCurrentImageIndex(index)}
+                        className={`overflow-hidden rounded-2xl border-4 ${
+                          currentImageIndex === index
+                            ? "border-pink-500"
+                            : "border-transparent"
+                        }`}
+                      >
+                        <img
+                          src={image}
+                          alt={`Bild ${index + 1}`}
+                          className="h-20 w-20 object-cover"
+                        />
+                      </button>
+                    ))}
+                  </div>
+                </>
+              )}
+            </div>
+          </div>
+        )}
+
+        {selectedVideo && (
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4"
+            onClick={() => setSelectedVideo(null)}
+          >
+            <div
+              className="relative w-full max-w-3xl rounded-[32px] bg-white p-4 shadow-2xl"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <button
+                onClick={() => setSelectedVideo(null)}
+                className="absolute right-4 top-4 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-black text-xl font-bold text-white"
+              >
+                ×
+              </button>
+
+              <video controls autoPlay className="w-full rounded-3xl">
+                <source src={selectedVideo} type="video/mp4" />
+              </video>
+            </div>
           </div>
         )}
       </div>

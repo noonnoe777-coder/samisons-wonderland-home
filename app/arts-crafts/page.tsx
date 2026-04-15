@@ -242,7 +242,7 @@ export default function ArtsCraftsPage() {
                       className="min-h-[70px] w-full rounded-xl border-2 border-pink-200 bg-pink-50 px-3 py-2 text-[11px] text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-pink-400 focus:bg-white sm:min-h-[90px] sm:text-sm"
                     />
 
-                    <div className="flex items-center gap-2">
+                    <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
                       <div className="flex items-center rounded-xl border border-pink-200 bg-pink-50 px-1 py-1">
                         <button
                           onClick={() => {
@@ -286,7 +286,7 @@ export default function ArtsCraftsPage() {
                         }&gravur=${
                           engraving[product.id] || false
                         }`}
-                        className="flex-1 rounded-xl bg-pink-500 px-3 py-2 text-center text-[11px] font-bold text-white transition hover:bg-pink-600 sm:text-sm"
+                        className="w-full sm:flex-1 rounded-xl bg-pink-500 px-3 py-2 text-center text-[11px] font-bold text-white transition hover:bg-pink-600 sm:text-sm"
                       >
                         Bestellen
                       </Link>
@@ -435,7 +435,7 @@ export default function ArtsCraftsPage() {
                 <img
                   src={selectedImageProduct.images[currentImageIndex]}
                   alt={selectedImageProduct.name}
-                  className="h-[500px] w-full rounded-3xl object-cover"
+                  className="max-h-[80vh] w-full rounded-3xl object-contain bg-white"
                 />
 
                 {selectedImageProduct.images.length > 1 && (
