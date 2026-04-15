@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 
 export default function Navbar() {
@@ -64,6 +66,20 @@ export default function Navbar() {
           className="transition hover:text-pink-500"
         >
           Schreibwaren
+        </Link>
+
+        <Link
+          href="/heimware"
+          className="transition hover:text-pink-500"
+        >
+          Heimware
+        </Link>
+
+        <Link
+          href="/arts-crafts"
+          className="transition hover:text-pink-500"
+        >
+          Arts & Crafts
         </Link>
 
         <Link

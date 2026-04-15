@@ -4,7 +4,11 @@ import { useEffect, useState } from "react";
 import Navbar from "@/Components/Navbar";
 import { supabase } from "@/app/lib/supabase";
 
-type ProductCategory = "Spielzeug" | "Schreibwaren";
+type ProductCategory =
+  | "Spielzeug"
+  | "Schreibwaren"
+  | "Heimware"
+  | "Arts & Crafts";
 
 type Product = {
   id: number;
@@ -12,6 +16,7 @@ type Product = {
   category: ProductCategory;
   price: string;
   description: string;
+  image: string | null;
   images: string[];
   video: string | null;
   deliveryText: string;
@@ -20,6 +25,8 @@ type Product = {
 
 export default function ProdukteAdminPage() {
   const [products, setProducts] = useState<Product[]>([]);
+
+  const [editingId, setEditingId] = useState<number | null>(null);
 
   const [name, setName] = useState("");
   const [category, setCategory] =
@@ -53,31 +60,8 @@ export default function ProdukteAdminPage() {
     setProducts((data as Product[]) || []);
   };
 
-  const addProduct = async () => {
-    if (!name || !price || !description || images.length === 0) {
-      alert("Bitte Name, Preis, Beschreibung und Bilder eingeben.");
-      return;
-    }
-
-    const { error } = await supabase.from("spielzeuge").insert([
-      {
-        name,
-        category,
-        price,
-        description,
-        images,
-        video,
-        deliveryText,
-        noReturn,
-      },
-    ]);
-
-    if (error) {
-      console.error(error);
-      alert("Fehler beim Speichern");
-      return;
-    }
-
+  const resetForm = () => {
+    setEditingId(null);
     setName("");
     setCategory("Spielzeug");
     setPrice("");
@@ -86,13 +70,68 @@ export default function ProdukteAdminPage() {
     setVideo(null);
     setDeliveryText("Lieferzeit: 1 Woche");
     setNoReturn(true);
+  };
 
-    loadProducts();
+  const saveProduct = async () => {
+    if (!name || !price || !description || images.length === 0) {
+      alert(
+        "Bitte Name, Preis, Beschreibung und mindestens 1 Bild eingeben."
+      );
+      return;
+    }
 
-    alert("Produkt gespeichert");
+    let error = null;
+
+    const payload = {
+      name,
+      category,
+      price,
+      description,
+      image: images[0],
+      images,
+      video,
+      deliveryText,
+      noReturn,
+    };
+
+    if (editingId) {
+      const result = await supabase
+        .from("spielzeuge")
+        .update(payload)
+        .eq("id", editingId);
+
+      error = result.error;
+    } else {
+      const result = await supabase
+        .from("spielzeuge")
+        .insert([payload]);
+
+      error = result.error;
+    }
+
+    if (error) {
+      console.error("SUPABASE ERROR:", error);
+      alert(`Fehler beim Speichern: ${error.message}`);
+      return;
+    }
+
+    resetForm();
+    await loadProducts();
+
+    alert(
+      editingId
+        ? "Produkt erfolgreich bearbeitet"
+        : "Produkt gespeichert"
+    );
   };
 
   const deleteProduct = async (id: number) => {
+    const confirmed = confirm(
+      "Möchtest du dieses Produkt wirklich löschen?"
+    );
+
+    if (!confirmed) return;
+
     const { error } = await supabase
       .from("spielzeuge")
       .delete()
@@ -104,8 +143,15 @@ export default function ProdukteAdminPage() {
       return;
     }
 
-    loadProducts();
+    await loadProducts();
   };
+
+  const categories: ProductCategory[] = [
+    "Spielzeug",
+    "Schreibwaren",
+    "Heimware",
+    "Arts & Crafts",
+  ];
 
   return (
     <main className="min-h-screen bg-[#eef5ff]">
@@ -119,7 +165,7 @@ export default function ProdukteAdminPage() {
         <div className="max-w-[700px] rounded-3xl bg-white p-6 shadow-lg">
           <div className="flex flex-col gap-4">
             <h2 className="text-2xl font-bold text-blue-500">
-              Neues Produkt
+              {editingId ? "Produkt bearbeiten" : "Neues Produkt"}
             </h2>
 
             <input
@@ -139,11 +185,13 @@ export default function ProdukteAdminPage() {
             >
               <option value="Spielzeug">Spielzeug</option>
               <option value="Schreibwaren">Schreibwaren</option>
+              <option value="Heimware">Heimware</option>
+              <option value="Arts & Crafts">Arts & Crafts</option>
             </select>
 
             <input
               type="text"
-              placeholder="Preis"
+              placeholder="Preis z.B. 24.99"
               value={price}
               onChange={(e) => setPrice(e.target.value)}
               className="rounded-2xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-pink-400"
@@ -160,6 +208,7 @@ export default function ProdukteAdminPage() {
               type="text"
               value={deliveryText}
               onChange={(e) => setDeliveryText(e.target.value)}
+              placeholder="Lieferzeit"
               className="rounded-2xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-pink-400"
             />
 
@@ -168,6 +217,7 @@ export default function ProdukteAdminPage() {
                 type="checkbox"
                 checked={noReturn}
                 onChange={(e) => setNoReturn(e.target.checked)}
+                className="h-4 w-4"
               />
               Keine Rückannahme möglich
             </label>
@@ -197,8 +247,8 @@ export default function ProdukteAdminPage() {
                           reader.readAsDataURL(file);
                         })
                     )
-                  ).then((result) => {
-                    setImages(result);
+                  ).then((base64Images) => {
+                    setImages(base64Images);
                   });
                 }}
                 className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
@@ -248,71 +298,103 @@ export default function ProdukteAdminPage() {
               )}
             </div>
 
-            <button
-              onClick={addProduct}
-              className="rounded-full bg-yellow-400 px-6 py-3 text-sm font-bold text-white shadow transition hover:scale-105"
-            >
-              Produkt speichern
-            </button>
+            <div className="flex gap-3">
+              <button
+                onClick={saveProduct}
+                className="flex-1 rounded-full bg-yellow-400 px-6 py-3 text-sm font-bold text-white shadow transition hover:scale-105"
+              >
+                {editingId
+                  ? "Änderungen speichern"
+                  : "Produkt speichern"}
+              </button>
+
+              {editingId && (
+                <button
+                  onClick={resetForm}
+                  className="rounded-full bg-slate-200 px-6 py-3 text-sm font-bold text-slate-700 transition hover:bg-slate-300"
+                >
+                  Abbrechen
+                </button>
+              )}
+            </div>
           </div>
         </div>
 
         <div className="mt-8 grid grid-cols-1 gap-5 lg:grid-cols-2">
-          {(["Spielzeug", "Schreibwaren"] as ProductCategory[]).map(
-            (currentCategory) => (
-              <div
-                key={currentCategory}
-                className="rounded-3xl bg-white p-5 shadow-lg"
-              >
-                <h2
-                  className={`mb-4 text-2xl font-bold ${
-                    currentCategory === "Spielzeug"
-                      ? "text-blue-500"
-                      : "text-pink-500"
-                  }`}
-                >
-                  {currentCategory}
-                </h2>
+          {categories.map((currentCategory) => (
+            <div
+              key={currentCategory}
+              className="rounded-3xl bg-white p-5 shadow-lg"
+            >
+              <h2 className="mb-4 text-2xl font-bold text-pink-500">
+                {currentCategory}
+              </h2>
 
-                <div className="flex flex-col gap-3">
-                  {products
-                    .filter(
-                      (product) => product.category === currentCategory
-                    )
-                    .map((product) => (
-                      <div
-                        key={product.id}
-                        className="flex items-center justify-between rounded-2xl border border-slate-100 bg-slate-50 p-3"
-                      >
-                        <div className="flex items-center gap-3">
-                          {product.images?.[0] && (
-                            <img
-                              src={product.images[0]}
-                              alt={product.name}
-                              className="h-14 w-14 rounded-xl object-cover"
-                            />
+              <div className="flex flex-col gap-3">
+                {products
+                  .filter(
+                    (product) => product.category === currentCategory
+                  )
+                  .map((product) => (
+                    <div
+                      key={product.id}
+                      className="flex items-center justify-between rounded-2xl border border-slate-100 bg-slate-50 p-3"
+                    >
+                      <div className="flex items-center gap-3">
+                        {(product.images?.[0] || product.image) && (
+                          <img
+                            src={product.images?.[0] || product.image || ""}
+                            alt={product.name}
+                            className="h-14 w-14 rounded-xl object-cover"
+                          />
+                        )}
+
+                        <div className="flex flex-col">
+                          <span className="text-sm font-bold text-slate-700">
+                            {product.name}
+                          </span>
+
+                          <span className="text-xs text-slate-500">
+                            {product.price} €
+                          </span>
+
+                          <span className="text-xs text-slate-400">
+                            {product.images?.length || 1} Bilder
+                          </span>
+
+                          {product.video && (
+                            <span className="text-xs font-medium text-pink-500">
+                              Video vorhanden
+                            </span>
                           )}
-
-                          <div className="flex flex-col">
-                            <span className="text-sm font-bold text-slate-700">
-                              {product.name}
-                            </span>
-
-                            <span className="text-xs text-slate-500">
-                              {product.price} €
-                            </span>
-
-                            <span className="text-xs text-slate-400">
-                              {product.images?.length || 0} Bilder
-                            </span>
-
-                            {product.video && (
-                              <span className="text-xs font-medium text-pink-500">
-                                Video vorhanden
-                              </span>
-                            )}
-                          </div>
                         </div>
+                      </div>
+
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => {
+                            setEditingId(product.id);
+                            setName(product.name);
+                            setCategory(product.category);
+                            setPrice(product.price);
+                            setDescription(product.description);
+                            setImages(product.images || []);
+                            setVideo(product.video);
+                            setDeliveryText(
+                              product.deliveryText ||
+                                "Lieferzeit: 1 Woche"
+                            );
+                            setNoReturn(product.noReturn ?? true);
+
+                            window.scrollTo({
+                              top: 0,
+                              behavior: "smooth",
+                            });
+                          }}
+                          className="rounded-full bg-blue-500 px-4 py-2 text-xs font-bold text-white transition hover:bg-blue-600"
+                        >
+                          Bearbeiten
+                        </button>
 
                         <button
                           onClick={() => deleteProduct(product.id)}
@@ -321,11 +403,11 @@ export default function ProdukteAdminPage() {
                           Löschen
                         </button>
                       </div>
-                    ))}
-                </div>
+                    </div>
+                  ))}
               </div>
-            )
-          )}
+            </div>
+          ))}
         </div>
       </div>
     </main>
