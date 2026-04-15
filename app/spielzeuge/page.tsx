@@ -11,8 +11,10 @@ type Product = {
   category: string;
   price: string;
   description: string;
-  image: string | null;
+  images: string[];
   video: string | null;
+  deliveryText: string;
+  noReturn: boolean;
 };
 
 export default function SpielzeugePage() {
@@ -22,13 +24,18 @@ export default function SpielzeugePage() {
   const [selectedDescription, setSelectedDescription] =
     useState<Product | null>(null);
 
-  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [selectedImageProduct, setSelectedImageProduct] =
+    useState<Product | null>(null);
+
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
   const [selectedVideo, setSelectedVideo] = useState<string | null>(null);
 
   const [quantities, setQuantities] = useState<Record<number, number>>({});
   const [notes, setNotes] = useState<Record<number, string>>({});
   const [giftWrap, setGiftWrap] = useState<Record<number, boolean>>({});
   const [engraving, setEngraving] = useState<Record<number, boolean>>({});
+  const [favorites, setFavorites] = useState<Record<number, boolean>>({});
 
   useEffect(() => {
     const loadProducts = async () => {
@@ -92,13 +99,25 @@ export default function SpielzeugePage() {
                 key={product.id}
                 className="flex w-full flex-col overflow-hidden rounded-[24px] bg-white shadow-xl transition hover:-translate-y-1 hover:shadow-2xl"
               >
-                {product.image && (
+                {product.images?.[0] && (
                   <div className="relative aspect-square w-full overflow-hidden bg-slate-100">
                     <img
-                      src={product.image}
+                      src={product.images[0]}
                       alt={product.name}
                       className="h-full w-full object-cover"
                     />
+
+                    <button
+                      onClick={() =>
+                        setFavorites((prev) => ({
+                          ...prev,
+                          [product.id]: !prev[product.id],
+                        }))
+                      }
+                      className="absolute left-3 top-3 flex h-11 w-11 items-center justify-center rounded-full bg-white/90 text-2xl shadow-lg transition hover:scale-110"
+                    >
+                      {favorites[product.id] ? "❤️" : "🤍"}
+                    </button>
 
                     {product.video && (
                       <button
@@ -126,6 +145,14 @@ export default function SpielzeugePage() {
                     <span className="shrink-0 rounded-full bg-pink-100 px-2 py-1 text-[10px] font-bold text-pink-500 sm:text-xs">
                       Spielzeug
                     </span>
+                  </div>
+
+                  <div className="mb-3 rounded-2xl border border-slate-200 bg-slate-50 p-3 text-[11px] text-slate-700 sm:text-sm">
+                    <p className="mb-1">📦 {product.deliveryText}</p>
+
+                    {product.noReturn && (
+                      <p>⚠️ Keine Rückannahme möglich</p>
+                    )}
                   </div>
 
                   <div className="space-y-2">
@@ -221,6 +248,22 @@ export default function SpielzeugePage() {
                       </Link>
                     </div>
 
+                    <button
+                      onClick={() =>
+                        setFavorites((prev) => ({
+                          ...prev,
+                          [product.id]: !prev[product.id],
+                        }))
+                      }
+                      className="flex w-full items-center justify-center gap-2 rounded-xl border-2 border-pink-200 px-3 py-2 text-[11px] font-bold text-pink-500 transition hover:bg-pink-50 sm:text-sm"
+                    >
+                      <span className="text-lg">
+                        {favorites[product.id] ? "❤️" : "🤍"}
+                      </span>
+
+                      {favorites[product.id] ? "Gemerkt" : "Merken"}
+                    </button>
+
                     <Link
                       href="/bewerten"
                       className="block w-full rounded-xl bg-yellow-400 px-3 py-2 text-center text-[11px] font-bold text-white transition hover:bg-yellow-500 sm:text-sm"
@@ -235,12 +278,15 @@ export default function SpielzeugePage() {
                       Beschreibung
                     </button>
 
-                    {product.image && (
+                    {product.images?.length > 0 && (
                       <button
-                        onClick={() => setSelectedImage(product.image)}
+                        onClick={() => {
+                          setSelectedImageProduct(product);
+                          setCurrentImageIndex(0);
+                        }}
                         className="w-full rounded-xl border-2 border-blue-200 px-3 py-2 text-[11px] font-bold text-blue-500 transition hover:bg-blue-50 sm:text-sm"
                       >
-                        Produktbild
+                        Produktbilder ({product.images.length})
                       </button>
                     )}
                   </div>
@@ -249,92 +295,154 @@ export default function SpielzeugePage() {
             ))}
           </div>
         )}
-      </div>
 
-      {selectedDescription && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="relative w-full max-w-lg rounded-[32px] bg-white p-6 shadow-2xl">
-            <button
-              onClick={() => setSelectedDescription(null)}
-              className="absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-full bg-pink-100 text-xl font-bold text-pink-500 transition hover:bg-pink-200"
-            >
-              ×
-            </button>
+        {selectedDescription && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+            <div className="relative w-full max-w-lg rounded-[32px] bg-white p-6 shadow-2xl">
+              <button
+                onClick={() => setSelectedDescription(null)}
+                className="absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-full bg-pink-100 text-xl font-bold text-pink-500"
+              >
+                ×
+              </button>
 
-            <h2 className="mb-5 pr-12 text-2xl font-bold text-pink-500 sm:text-3xl">
-              {selectedDescription.name}
-            </h2>
+              <h2 className="mb-5 pr-12 text-2xl font-bold text-pink-500">
+                {selectedDescription.name}
+              </h2>
 
-            {selectedDescription.image && (
-              <div className="mb-5 aspect-square w-full overflow-hidden rounded-3xl bg-slate-100">
+              {selectedDescription.images?.[0] && (
                 <img
-                  src={selectedDescription.image}
+                  src={selectedDescription.images[0]}
                   alt={selectedDescription.name}
-                  className="h-full w-full object-cover"
+                  className="mb-5 h-72 w-full rounded-3xl object-cover"
                 />
+              )}
+
+              <p className="mb-3 text-2xl font-bold text-yellow-500">
+                {selectedDescription.price}
+              </p>
+
+              <div className="mb-4 rounded-2xl border border-slate-200 bg-slate-50 p-3 text-sm text-slate-700">
+                <p className="mb-1">
+                  📦 {selectedDescription.deliveryText}
+                </p>
+
+                {selectedDescription.noReturn && (
+                  <p>⚠️ Keine Rückannahme möglich</p>
+                )}
               </div>
-            )}
 
-            <p className="mb-4 text-xl font-bold text-yellow-500 sm:text-2xl">
-              {selectedDescription.price}
-            </p>
-
-            <p className="text-sm leading-6 text-slate-600 sm:text-base sm:leading-7">
-              {selectedDescription.description}
-            </p>
-          </div>
-        </div>
-      )}
-
-      {selectedImage && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
-          onClick={() => setSelectedImage(null)}
-        >
-          <div
-            className="relative w-full max-w-6xl rounded-[32px] bg-white p-4 shadow-2xl sm:p-5"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <button
-              onClick={() => setSelectedImage(null)}
-              className="absolute right-4 top-4 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-blue-100 text-xl font-bold text-blue-500 transition hover:bg-blue-200"
-            >
-              ×
-            </button>
-
-            <div className="aspect-square w-full overflow-hidden rounded-3xl bg-slate-100">
-              <img
-                src={selectedImage}
-                alt="Produktbild"
-                className="h-full w-full object-cover"
-              />
+              <p className="text-sm leading-7 text-slate-600">
+                {selectedDescription.description}
+              </p>
             </div>
           </div>
-        </div>
-      )}
+        )}
 
-      {selectedVideo && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4"
-          onClick={() => setSelectedVideo(null)}
-        >
+        {selectedImageProduct && (
           <div
-            className="relative w-full max-w-3xl rounded-[32px] bg-white p-4 shadow-2xl"
-            onClick={(e) => e.stopPropagation()}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4"
+            onClick={() => setSelectedImageProduct(null)}
           >
-            <button
-              onClick={() => setSelectedVideo(null)}
-              className="absolute right-4 top-4 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-black text-xl font-bold text-white"
+            <div
+              className="relative w-full max-w-5xl rounded-[32px] bg-white p-5 shadow-2xl"
+              onClick={(e) => e.stopPropagation()}
             >
-              ×
-            </button>
+              <button
+                onClick={() => setSelectedImageProduct(null)}
+                className="absolute right-4 top-4 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-blue-100 text-xl font-bold text-blue-500"
+              >
+                ×
+              </button>
 
-            <video controls autoPlay className="w-full rounded-3xl">
-              <source src={selectedVideo} type="video/mp4" />
-            </video>
+              <div className="relative">
+                <img
+                  src={
+                    selectedImageProduct.images[currentImageIndex]
+                  }
+                  alt={selectedImageProduct.name}
+                  className="h-[500px] w-full rounded-3xl object-cover"
+                />
+
+                {selectedImageProduct.images.length > 1 && (
+                  <>
+                    <button
+                      onClick={() =>
+                        setCurrentImageIndex((prev) =>
+                          prev === 0
+                            ? selectedImageProduct.images.length - 1
+                            : prev - 1
+                        )
+                      }
+                      className="absolute left-4 top-1/2 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-2xl shadow-lg"
+                    >
+                      ←
+                    </button>
+
+                    <button
+                      onClick={() =>
+                        setCurrentImageIndex((prev) =>
+                          prev === selectedImageProduct.images.length - 1
+                            ? 0
+                            : prev + 1
+                        )
+                      }
+                      className="absolute right-4 top-1/2 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-2xl shadow-lg"
+                    >
+                      →
+                    </button>
+                  </>
+                )}
+              </div>
+
+              {selectedImageProduct.images.length > 1 && (
+                <div className="mt-4 flex flex-wrap justify-center gap-3">
+                  {selectedImageProduct.images.map((image, index) => (
+                    <button
+                      key={index}
+                      onClick={() => setCurrentImageIndex(index)}
+                      className={`overflow-hidden rounded-2xl border-4 ${
+                        currentImageIndex === index
+                          ? "border-pink-500"
+                          : "border-transparent"
+                      }`}
+                    >
+                      <img
+                        src={image}
+                        alt={`Bild ${index + 1}`}
+                        className="h-20 w-20 object-cover"
+                      />
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
-        </div>
-      )}
+        )}
+
+        {selectedVideo && (
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4"
+            onClick={() => setSelectedVideo(null)}
+          >
+            <div
+              className="relative w-full max-w-3xl rounded-[32px] bg-white p-4 shadow-2xl"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <button
+                onClick={() => setSelectedVideo(null)}
+                className="absolute right-4 top-4 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-black text-xl font-bold text-white"
+              >
+                ×
+              </button>
+
+              <video controls autoPlay className="w-full rounded-3xl">
+                <source src={selectedVideo} type="video/mp4" />
+              </video>
+            </div>
+          </div>
+        )}
+      </div>
     </main>
   );
 }

@@ -3,7 +3,6 @@
 import { useParams } from "next/navigation";
 import { useState } from "react";
 import Navbar from "@/Components/Navbar";
-import { supabase } from "@/app/lib/supabase";
 
 export default function PaymentPage() {
   const params = useParams<{ id: string }>();
@@ -15,7 +14,18 @@ export default function PaymentPage() {
 
   const handlePayment = async (): Promise<void> => {
     try {
+      if (!name || !email) {
+        alert("Bitte Name und E-Mail eingeben.");
+        return;
+      }
+
       setLoading(true);
+
+      const urlParams = new URLSearchParams(window.location.search);
+
+      const menge = Number(urlParams.get("menge") || "1");
+      const geschenk = urlParams.get("geschenk") === "true";
+      const gravur = urlParams.get("gravur") === "true";
 
       const response = await fetch("/api/payment", {
         method: "POST",
@@ -26,10 +36,14 @@ export default function PaymentPage() {
           id,
           name,
           email,
+          menge,
+          geschenk,
+          gravur,
         }),
       });
 
-      const data: { url?: string; error?: string } = await response.json();
+      const data: { url?: string; error?: string } =
+        await response.json();
 
       if (!response.ok) {
         console.error("PAYMENT ERROR:", data);
@@ -57,9 +71,13 @@ export default function PaymentPage() {
 
       <div className="mx-auto flex max-w-2xl flex-col px-4 py-10">
         <div className="rounded-[32px] bg-white p-8 shadow-xl">
-          <h1 className="mb-6 text-center text-4xl font-bold text-pink-500">
+          <h1 className="mb-2 text-center text-4xl font-bold text-pink-500">
             Zahlung abschließen
           </h1>
+
+          <p className="mb-8 text-center text-sm text-slate-500">
+            Bezahle mit Kreditkarte oder PayPal
+          </p>
 
           <div className="space-y-5">
             <div>
@@ -96,8 +114,8 @@ export default function PaymentPage() {
               className="w-full rounded-2xl bg-pink-500 px-5 py-4 text-lg font-bold text-white transition hover:bg-pink-600 disabled:cursor-not-allowed disabled:opacity-70"
             >
               {loading
-  ? "Weiterleitung..."
-  : "Mit Karte, Klarna oder PayPal bezahlen"}
+                ? "Weiterleitung..."
+                : "Mit Kreditkarte oder PayPal bezahlen"}
             </button>
           </div>
         </div>

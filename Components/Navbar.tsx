@@ -44,12 +44,62 @@ export default function Navbar() {
         </h1>
       </div>
 
-      <div className="flex flex-wrap justify-center gap-3 sm:gap-4 md:gap-6 text-sm sm:text-base md:text-lg font-bold text-slate-700 font-[var(--font-nunito)]">
-        <Link href="/">Startseite</Link>
-        <Link href="/spielzeuge">Spielzeuge</Link>
-        <Link href="/schreibwaren">Schreibwaren</Link>
-        <Link href="/ueber-uns">Über uns</Link>
-        <Link href="/tracking">Tracking</Link>
+      <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4 md:gap-5 text-sm sm:text-base md:text-lg font-bold text-slate-700 font-[var(--font-nunito)]">
+        <Link
+          href="/"
+          className="transition hover:text-pink-500"
+        >
+          Startseite
+        </Link>
+
+        <Link
+          href="/spielzeuge"
+          className="transition hover:text-pink-500"
+        >
+          Spielzeuge
+        </Link>
+
+        <Link
+          href="/schreibwaren"
+          className="transition hover:text-pink-500"
+        >
+          Schreibwaren
+        </Link>
+
+        <Link
+          href="/ueber-uns"
+          className="transition hover:text-pink-500"
+        >
+          Über uns
+        </Link>
+
+        <Link
+          href="/tracking"
+          className="transition hover:text-pink-500"
+        >
+          Tracking
+        </Link>
+
+        <Link
+          href="/favoriten"
+          className="rounded-full border border-pink-200 bg-white px-4 py-2 text-pink-500 transition hover:bg-pink-50"
+        >
+          ❤️ Favoriten
+        </Link>
+
+        <Link
+          href="/anmelden"
+          className="rounded-full border border-pink-200 bg-white px-4 py-2 text-pink-500 transition hover:bg-pink-50"
+        >
+          Anmelden
+        </Link>
+
+        <Link
+          href="/registrieren"
+          className="rounded-full bg-pink-500 px-4 py-2 text-white shadow-md transition hover:bg-pink-600"
+        >
+          Registrieren
+        </Link>
 
         {isAdmin && (
           <Link
