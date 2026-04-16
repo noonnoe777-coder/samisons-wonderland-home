@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import { supabase } from "@/app/lib/supabase";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
-  apiVersion: "2025-02-24.acacia",
+  apiVersion: "2024-06-20",
 });
 
 export async function POST(req: Request) {
@@ -40,28 +40,30 @@ export async function POST(req: Request) {
     }
 
     const basePrice = Number(
-      String(product.price)
-        .replace("€", "")
-        .replace(",", ".")
-        .trim()
+      String(product.price).replace("€", "").replace(",", ".").trim()
     );
 
     let total = basePrice * Number(menge);
 
-    if (geschenk) {
-      total += 5;
-    }
+    if (geschenk) total += 5;
+    if (gravur) total += 10;
 
-    if (gravur) {
-      total += 10;
-    }
+    total += 4.99;
 
     const totalInCents = Math.round(total * 100);
+
+    const description = [
+      geschenk ? "Geschenkverpackung +5€" : null,
+      gravur ? "Gravur +10€" : null,
+      "Lieferkosten +4,99€",
+    ]
+      .filter(Boolean)
+      .join(" • ");
 
     const session = await stripe.checkout.sessions.create({
       mode: "payment",
 
-      payment_method_types: ["card", "paypal"],
+      payment_method_types: ["card"],
 
       customer_email: email,
       customer_creation: "always",
@@ -78,12 +80,7 @@ export async function POST(req: Request) {
             currency: "eur",
             product_data: {
               name: product.name,
-              description: [
-                geschenk ? "Geschenkverpackung +5€" : null,
-                gravur ? "Gravur +10€" : null,
-              ]
-                .filter(Boolean)
-                .join(" • "),
+              ...(description ? { description } : {}),
             },
             unit_amount: totalInCents,
           },
@@ -119,19 +116,11 @@ export async function POST(req: Request) {
       console.error("Supabase Fehler:", orderError);
     }
 
-    if (!session.url) {
-      return NextResponse.json(
-        { error: "Keine Stripe-URL erhalten." },
-        { status: 500 }
-      );
-    }
-
     return NextResponse.json({
       url: session.url,
     });
   } catch (error: any) {
-    console.error("FULL STRIPE ERROR:");
-    console.error(JSON.stringify(error, null, 2));
+    console.error(error);
 
     return NextResponse.json(
       {
