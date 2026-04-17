@@ -18,9 +18,9 @@ export default function AdminPage() {
       } = await supabase.auth.getUser();
 
       if (!user) {
-        router.push("/login");
-        return;
-      }
+  router.push("/");
+  return;
+}
 
       if (user.email !== "noonnoe777@gmail.com") {
         router.push("/");
