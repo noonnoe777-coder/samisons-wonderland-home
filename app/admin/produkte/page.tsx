@@ -232,31 +232,31 @@ export default function ProdukteAdminPage() {
   accept="image/*"
   multiple
   onChange={async (e) => {
-    const files = Array.from(e.target.files || []);
-    const uploadedUrls: string[] = [];
+  const files = Array.from(e.target.files || []);
+  const uploadedUrls: string[] = [];
 
-    for (const file of files) {
-      const fileName = `${Date.now()}-${file.name}`;
+  for (const file of files) {
+    const fileName = `products/${Date.now()}-${file.name}`;
 
-      const { error } = await supabase.storage
-        .from("produkten")
-        .upload(fileName, file);
+    const { error } = await supabase.storage
+      .from("products")
+      .upload(fileName, file);
 
-      if (error) {
-        console.error(error);
-        alert("Fehler beim Bild-Upload");
-        continue;
-      }
-
-      const { data } = supabase.storage
-        .from("produkten")
-        .getPublicUrl(fileName);
-
-      uploadedUrls.push(data.publicUrl);
+    if (error) {
+      console.error(error);
+      alert(`Fehler beim Bild-Upload: ${error.message}`);
+      continue;
     }
 
-    setImages(uploadedUrls);
-  }}
+    const { data } = supabase.storage
+      .from("products")
+      .getPublicUrl(fileName);
+
+    uploadedUrls.push(data.publicUrl);
+  }
+
+  setImages(uploadedUrls);
+}}
   className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
 />
 
