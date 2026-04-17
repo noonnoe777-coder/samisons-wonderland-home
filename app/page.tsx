@@ -129,10 +129,10 @@ export default function Page() {
           </p>
 
           <p
-            className={`mt-6 max-w-4xl text-lg font-semibold text-slate-700 sm:text-xl md:text-3xl ${addressFont}`}
-          >
-            {address}
-          </p>
+  className={`mt-6 max-w-4xl whitespace-pre-line text-lg font-semibold text-slate-700 sm:text-xl md:text-3xl ${addressFont}`}
+>
+  {address}
+</p>
 
           <Link
             href="/jetzt-mehr-erfahren"
@@ -151,10 +151,10 @@ export default function Page() {
             </h2>
 
             <p
-              className={`mt-6 text-base leading-relaxed text-slate-700 sm:text-lg md:text-2xl ${descriptionFont}`}
-            >
-              {description}
-            </p>
+  className={`mt-6 whitespace-pre-line text-base leading-relaxed text-slate-700 sm:text-lg md:text-2xl ${descriptionFont}`}
+>
+  {description}
+</p>
           </div>
 
           <div className="relative h-[260px] w-full max-w-[340px] sm:h-[340px] sm:max-w-[480px] md:h-[520px] md:w-[720px]">

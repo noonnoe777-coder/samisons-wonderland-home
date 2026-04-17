@@ -68,10 +68,10 @@ export default function JetztMehrErfahrenPage() {
           </h1>
 
           <p
-            className={`mx-auto mb-12 max-w-4xl text-center leading-10 text-slate-700 ${textFont} ${textSize}`}
-          >
-            {text}
-          </p>
+  className={`mx-auto mb-12 max-w-4xl whitespace-pre-line text-center leading-10 text-slate-700 ${textFont} ${textSize}`}
+>
+  {text}
+</p>
 
           {images.length > 0 && (
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">

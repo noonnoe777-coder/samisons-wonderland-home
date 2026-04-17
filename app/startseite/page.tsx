@@ -109,10 +109,10 @@ export default function StartseitePage(): JSX.Element {
         </p>
 
         <p
-          className={`text-base text-slate-600 sm:text-lg md:text-xl ${descriptionFont}`}
-        >
-          {description}
-        </p>
+  className={`whitespace-pre-line text-base text-slate-600 sm:text-lg md:text-xl ${descriptionFont}`}
+>
+  {description}
+</p>
       </div>
     </main>
   );
