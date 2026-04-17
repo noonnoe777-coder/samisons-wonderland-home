@@ -82,6 +82,8 @@ export default function ProdukteAdminPage() {
 
     let error = null;
 
+    console.log("Images vor dem Speichern:", images);
+
     const payload = {
       name,
       category,
@@ -255,7 +257,7 @@ export default function ProdukteAdminPage() {
     uploadedUrls.push(data.publicUrl);
   }
 
-  setImages(uploadedUrls);
+  setImages((prev) => [...prev, ...uploadedUrls]);
 }}
   className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
 />
