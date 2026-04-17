@@ -1,8 +1,46 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Navbar from "@/Components/Navbar";
 import { supabase } from "@/app/lib/supabase";
 
 export default function AdminPage() {
+  const router = useRouter();
+
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const checkAdmin = async () => {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      if (!user) {
+        router.push("/login");
+        return;
+      }
+
+      if (user.email !== "nooninchai777@gmail.com") {
+        router.push("/");
+        return;
+      }
+
+      setLoading(false);
+    };
+
+    checkAdmin();
+  }, [router]);
+
+  if (loading) {
+    return (
+      <main className="flex min-h-screen items-center justify-center bg-[#eef5ff]">
+        <p className="text-2xl font-bold text-pink-500">Lädt...</p>
+      </main>
+    );
+  }
+
   return (
     <main className="min-h-screen bg-[#eef5ff]">
       <Navbar />
