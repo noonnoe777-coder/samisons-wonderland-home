@@ -228,31 +228,37 @@ export default function ProdukteAdminPage() {
               </p>
 
               <input
-                type="file"
-                accept="image/*"
-                multiple
-                onChange={(e) => {
-                  const files = Array.from(e.target.files || []);
+  type="file"
+  accept="image/*"
+  multiple
+  onChange={async (e) => {
+    const files = Array.from(e.target.files || []);
+    const uploadedUrls: string[] = [];
 
-                  Promise.all(
-                    files.map(
-                      (file) =>
-                        new Promise<string>((resolve) => {
-                          const reader = new FileReader();
+    for (const file of files) {
+      const fileName = `${Date.now()}-${file.name}`;
 
-                          reader.onloadend = () => {
-                            resolve(reader.result as string);
-                          };
+      const { error } = await supabase.storage
+        .from("produkten")
+        .upload(fileName, file);
 
-                          reader.readAsDataURL(file);
-                        })
-                    )
-                  ).then((base64Images) => {
-                    setImages(base64Images);
-                  });
-                }}
-                className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
-              />
+      if (error) {
+        console.error(error);
+        alert("Fehler beim Bild-Upload");
+        continue;
+      }
+
+      const { data } = supabase.storage
+        .from("produkten")
+        .getPublicUrl(fileName);
+
+      uploadedUrls.push(data.publicUrl);
+    }
+
+    setImages(uploadedUrls);
+  }}
+  className="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"
+/>
 
               {images.length > 0 && (
                 <div className="mt-4 flex flex-wrap gap-3">
