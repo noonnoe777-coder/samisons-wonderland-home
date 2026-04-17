@@ -14,10 +14,16 @@ export default function AdminPage() {
         data: { user },
       } = await supabase.auth.getUser();
 
-      console.log("User:", user);
-      console.log("Email:", user?.email);
+      if (!user) {
+        window.location.href = "/";
+        return;
+      }
 
-      // temporarily no redirect so you can inspect the console
+      if (user.email?.toLowerCase() !== "noonnoe777@gmail.com") {
+        window.location.href = "/";
+        return;
+      }
+
       setLoading(false);
     };
 
