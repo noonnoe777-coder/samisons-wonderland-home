@@ -1,13 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Navbar from "@/Components/Navbar";
 import { supabase } from "@/app/lib/supabase";
 
 export default function AdminPage() {
-  const router = useRouter();
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -19,21 +17,12 @@ export default function AdminPage() {
       console.log("User:", user);
       console.log("Email:", user?.email);
 
-      if (!user) {
-        router.push("/");
-        return;
-      }
-
-      if (user.email?.toLowerCase() !== "noonnoe777@gmail.com") {
-        router.push("/");
-        return;
-      }
-
+      // temporarily no redirect so you can inspect the console
       setLoading(false);
     };
 
     checkAdmin();
-  }, [router]);
+  }, []);
 
   if (loading) {
     return (
