@@ -313,10 +313,10 @@ export default function StartseiteAdminPage() {
             </p>
 
             <p
-              className={`${descriptionSize} max-w-2xl leading-8 text-slate-600 ${descriptionFont}`}
-            >
-              {description}
-            </p>
+  className={`${descriptionSize} max-w-2xl whitespace-pre-line leading-8 text-slate-600 ${descriptionFont}`}
+>
+  {description}
+</p>
           </div>
         </div>
       </div>

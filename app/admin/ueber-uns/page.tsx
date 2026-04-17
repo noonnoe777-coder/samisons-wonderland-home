@@ -269,10 +269,10 @@ export default function UeberUnsAdminPage() {
             </h2>
 
             <p
-              className={`leading-9 text-slate-700 ${descriptionFont} ${descriptionSize}`}
-            >
-              {description}
-            </p>
+  className={`whitespace-pre-line leading-9 text-slate-700 ${descriptionFont} ${descriptionSize}`}
+>
+  {description}
+</p>
           </div>
         </div>
       </div>

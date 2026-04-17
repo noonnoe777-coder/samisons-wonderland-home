@@ -358,10 +358,6 @@ export default function ProdukteAdminPage() {
                             {product.price} €
                           </span>
 
-                          <p className="mt-1 whitespace-pre-line text-xs text-slate-500">
-    {product.description}
-  </p>
-
                           <span className="text-xs text-slate-400">
                             {product.images?.length || 1} Bilder
                           </span>

@@ -219,10 +219,10 @@ export default function JetztMehrErfahrenAdminPage() {
             </h2>
 
             <p
-              className={`mb-10 leading-10 text-slate-700 ${textFont} ${textSize}`}
-            >
-              {text}
-            </p>
+  className={`mb-10 whitespace-pre-line leading-10 text-slate-700 ${textFont} ${textSize}`}
+>
+  {text}
+</p>
 
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {images.map((image, index) => (
