@@ -8,7 +8,6 @@ import { supabase } from "@/app/lib/supabase";
 
 export default function AdminPage() {
   const router = useRouter();
-
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -17,12 +16,15 @@ export default function AdminPage() {
         data: { user },
       } = await supabase.auth.getUser();
 
-      if (!user) {
-  router.push("/");
-  return;
-}
+      console.log("User:", user);
+      console.log("Email:", user?.email);
 
-      if (user.email !== "noonnoe777@gmail.com") {
+      if (!user) {
+        router.push("/");
+        return;
+      }
+
+      if (user.email?.toLowerCase() !== "noonnoe777@gmail.com") {
         router.push("/");
         return;
       }
@@ -58,7 +60,6 @@ export default function AdminPage() {
             <h2 className="mb-3 text-3xl font-bold text-pink-500">
               Produkte verwalten
             </h2>
-
             <p className="text-slate-600">
               Produkte hinzufügen, bearbeiten und löschen.
             </p>
@@ -71,7 +72,6 @@ export default function AdminPage() {
             <h2 className="mb-3 text-3xl font-bold text-blue-500">
               Bestellungen
             </h2>
-
             <p className="text-slate-600">
               Bestellungen und Status verwalten.
             </p>
@@ -84,7 +84,6 @@ export default function AdminPage() {
             <h2 className="mb-3 text-3xl font-bold text-purple-500">
               Bewertungen
             </h2>
-
             <p className="text-slate-600">
               Kundenbewertungen ansehen, beantworten und bearbeiten.
             </p>
@@ -97,7 +96,6 @@ export default function AdminPage() {
             <h2 className="mb-3 text-3xl font-bold text-yellow-500">
               Tracking
             </h2>
-
             <p className="text-slate-600">
               Lieferstatus und Versand bearbeiten.
             </p>
@@ -110,7 +108,6 @@ export default function AdminPage() {
             <h2 className="mb-3 text-3xl font-bold text-green-500">
               Startseite bearbeiten
             </h2>
-
             <p className="text-slate-600">
               Bilder und Texte der Startseite ändern.
             </p>
@@ -123,7 +120,6 @@ export default function AdminPage() {
             <h2 className="mb-3 text-3xl font-bold text-pink-500">
               Über uns bearbeiten
             </h2>
-
             <p className="text-slate-600">
               Bilder, Video und Beschreibung ändern.
             </p>
@@ -136,7 +132,6 @@ export default function AdminPage() {
             <h2 className="mb-3 text-3xl font-bold text-orange-500">
               Jetzt mehr erfahren bearbeiten
             </h2>
-
             <p className="text-slate-600">
               Texte, Schriftarten, Größen und bis zu 5 Bilder bearbeiten.
             </p>
