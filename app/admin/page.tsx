@@ -22,7 +22,7 @@ export default function AdminPage() {
         return;
       }
 
-      if (user.email !== "nooninchai777@gmail.com") {
+      if (user.email !== "noonnoe777@gmail.com") {
         router.push("/");
         return;
       }
